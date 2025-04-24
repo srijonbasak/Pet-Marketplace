@@ -2,6 +2,14 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
+  firstName: {
+    type: String,
+    trim: true
+  },
+  lastName: {
+    type: String,
+    trim: true
+  },
   username: { 
     type: String, 
     required: true, 
@@ -34,10 +42,18 @@ const userSchema = new mongoose.Schema({
     country: String
   },
   profileImage: {
-    type: String
+    data: Buffer,
+    contentType: String
   },
   bio: {
     type: String
+  },
+  // Password reset fields
+  resetPasswordCode: {
+    type: String
+  },
+  resetPasswordExpires: {
+    type: Date
   },
   // Fields specific to NGOs
   ngoDetails: {
@@ -49,6 +65,13 @@ const userSchema = new mongoose.Schema({
       type: Boolean,
       default: false
     }
+  },
+  // Fields specific to buyers
+  petPreferences: {
+    species: [String],
+    breed: [String],
+    age: [String],
+    size: [String]
   },
   // For favorite pets and products
   favorites: {

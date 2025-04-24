@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
-import jwtDecode from 'jwt-decode';
 import { toast } from 'react-toastify';
-import axios from 'axios';
+import authService from '../services/auth';
+import { userAPI } from '../services/api';
 
 export const AuthContext = createContext();
 
@@ -12,39 +12,29 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const checkAuthStatus = async () => {
-      const token = localStorage.getItem('token');
-      if (token) {
+      console.log('Checking authentication status...');
+      if (authService.isAuthenticated()) {
+        console.log('Token is valid, fetching user data');
+        
         try {
-          // Check if token is expired
-          const decodedToken = jwtDecode(token);
-          if (decodedToken.exp * 1000 < Date.now()) {
-            // Token is expired
-            localStorage.removeItem('token');
-            setIsAuthenticated(false);
-            setCurrentUser(null);
-          } else {
-            // Set auth token to all requests
-            axios.defaults.headers.common['x-auth-token'] = token;
-            
-            // Get current user data
-            try {
-              const res = await axios.get('/api/users/me');
-              setCurrentUser(res.data);
-              setIsAuthenticated(true);
-            } catch (err) {
-              console.error('Error fetching user data:', err);
-              localStorage.removeItem('token');
-              setIsAuthenticated(false);
-              setCurrentUser(null);
-            }
-          }
+          // Get current user data
+          const res = await userAPI.getCurrentUser();
+          setCurrentUser(res.data);
+          setIsAuthenticated(true);
+          console.log('User authenticated successfully');
         } catch (err) {
-          console.error('Error decoding token:', err);
-          localStorage.removeItem('token');
+          console.error('Error fetching user data:', err);
+          authService.removeToken();
           setIsAuthenticated(false);
           setCurrentUser(null);
         }
+      } else {
+        console.log('No valid token found');
+        authService.removeToken(); // Clean up any invalid tokens
+        setIsAuthenticated(false);
+        setCurrentUser(null);
       }
+      
       setIsLoading(false);
     };
 
@@ -54,25 +44,22 @@ export const AuthProvider = ({ children }) => {
   // Login user
   const login = async (email, password) => {
     try {
-      const res = await axios.post('/api/users/login', { email, password });
-      const { token } = res.data;
-      
-      // Save token to localStorage
-      localStorage.setItem('token', token);
-      
-      // Set auth token to all requests
-      axios.defaults.headers.common['x-auth-token'] = token;
+      console.log('Attempting login with email:', email);
+      await authService.login({ email, password });
       
       // Get user info
-      const userRes = await axios.get('/api/users/me');
+      const userRes = await userAPI.getCurrentUser();
       setCurrentUser(userRes.data);
       setIsAuthenticated(true);
       
+      console.log('Login successful');
       toast.success('Login successful!');
       return true;
     } catch (err) {
-      const errorMsg = err.response && err.response.data.msg ? 
-        err.response.data.msg : 'Login failed. Please try again.';
+      console.error('Login error:', err);
+      const errorMsg = err.response && err.response.data.message 
+        ? err.response.data.message 
+        : 'Login failed. Please try again.';
       toast.error(errorMsg);
       return false;
     }
@@ -81,25 +68,22 @@ export const AuthProvider = ({ children }) => {
   // Register user
   const register = async (userData) => {
     try {
-      const res = await axios.post('/api/users/register', userData);
-      const { token } = res.data;
-      
-      // Save token to localStorage
-      localStorage.setItem('token', token);
-      
-      // Set auth token to all requests
-      axios.defaults.headers.common['x-auth-token'] = token;
+      console.log('Attempting to register user');
+      await authService.register(userData);
       
       // Get user info
-      const userRes = await axios.get('/api/users/me');
+      const userRes = await userAPI.getCurrentUser();
       setCurrentUser(userRes.data);
       setIsAuthenticated(true);
       
+      console.log('Registration successful');
       toast.success('Registration successful!');
       return true;
     } catch (err) {
-      const errorMsg = err.response && err.response.data.msg ? 
-        err.response.data.msg : 'Registration failed. Please try again.';
+      console.error('Registration error:', err);
+      const errorMsg = err.response && err.response.data.message 
+        ? err.response.data.message 
+        : 'Registration failed. Please try again.';
       toast.error(errorMsg);
       return false;
     }
@@ -107,8 +91,8 @@ export const AuthProvider = ({ children }) => {
 
   // Logout user
   const logout = () => {
-    localStorage.removeItem('token');
-    delete axios.defaults.headers.common['x-auth-token'];
+    console.log('Logging out user');
+    authService.logout();
     setCurrentUser(null);
     setIsAuthenticated(false);
     toast.info('Logged out successfully');
@@ -117,28 +101,34 @@ export const AuthProvider = ({ children }) => {
   // Update user
   const updateProfile = async (userData) => {
     try {
-      const res = await axios.put('/api/users/me', userData);
+      console.log('Updating user profile');
+      const res = await userAPI.updateProfile(userData);
       setCurrentUser(res.data);
+      console.log('Profile updated successfully');
       toast.success('Profile updated successfully');
       return true;
     } catch (err) {
-      const errorMsg = err.response && err.response.data.msg ? 
-        err.response.data.msg : 'Profile update failed. Please try again.';
+      console.error('Profile update error:', err);
+      const errorMsg = err.response && err.response.data.message 
+        ? err.response.data.message 
+        : 'Profile update failed. Please try again.';
       toast.error(errorMsg);
       return false;
     }
   };
 
+  const value = {
+    currentUser, 
+    isAuthenticated,
+    isLoading,
+    login,
+    register,
+    logout,
+    updateProfile
+  };
+
   return (
-    <AuthContext.Provider value={{ 
-      currentUser, 
-      isAuthenticated,
-      isLoading,
-      login,
-      register,
-      logout,
-      updateProfile
-    }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

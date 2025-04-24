@@ -75,7 +75,7 @@ const Login = () => {
                   />
                 </Form.Group>
                 
-                <Form.Group className="mb-4" controlId="password">
+                <Form.Group className="mb-3" controlId="password">
                   <Form.Label>Password</Form.Label>
                   <Form.Control
                     type="password"
@@ -84,6 +84,11 @@ const Login = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
+                  <div className="d-flex justify-content-end mt-1">
+                    <Link to="/forgot-password" className="text-decoration-none small">
+                      Forgot password?
+                    </Link>
+                  </div>
                 </Form.Group>
                 
                 <Button

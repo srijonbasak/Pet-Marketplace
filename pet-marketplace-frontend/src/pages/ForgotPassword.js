@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Container, Card, Form, Button, Alert } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faKey, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -11,22 +12,38 @@ const ForgotPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [resetCode, setResetCode] = useState('');
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleEmailSubmit = (e) => {
+  const handleEmailSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     
-    // This would normally send a request to your backend API to send a reset code
-    // For now, we'll just simulate the process
-    setMessage({ type: 'success', text: 'If an account with this email exists, a password reset code has been sent.' });
-    
-    // Simulate moving to step 2 after 2 seconds
-    setTimeout(() => {
-      setStep(2);
-      setMessage({ type: '', text: '' });
-    }, 2000);
+    try {
+      // Send request to backend to get reset code
+      const response = await axios.post('/api/users/forgot-password', { email });
+      
+      setMessage({ 
+        type: 'success', 
+        text: response.data.message || 'If an account with this email exists, a password reset code has been sent.' 
+      });
+      
+      // Move to step 2 after 2 seconds
+      setTimeout(() => {
+        setStep(2);
+        setMessage({ type: '', text: '' });
+      }, 2000);
+    } catch (error) {
+      setMessage({ 
+        type: 'danger', 
+        text: error.response?.data?.message || 'Something went wrong. Please try again.' 
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handlePasswordSubmit = (e) => {
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     
     // Validate passwords match
@@ -35,14 +52,38 @@ const ForgotPassword = () => {
       return;
     }
     
-    // This would normally send a request to your backend API to reset the password
-    // For now, we'll just simulate success
-    setMessage({ type: 'success', text: 'Your password has been successfully reset. You can now log in with your new password.' });
+    setIsLoading(true);
     
-    // Clear form
-    setNewPassword('');
-    setConfirmPassword('');
-    setResetCode('');
+    try {
+      // Send request to reset password
+      const response = await axios.post('/api/users/reset-password', {
+        email,
+        resetCode,
+        newPassword
+      });
+      
+      setMessage({ 
+        type: 'success', 
+        text: response.data.message || 'Your password has been successfully reset. You can now log in with your new password.' 
+      });
+      
+      // Clear form
+      setNewPassword('');
+      setConfirmPassword('');
+      setResetCode('');
+      
+      // Redirect to login after 3 seconds
+      setTimeout(() => {
+        navigate('/login');
+      }, 3000);
+    } catch (error) {
+      setMessage({ 
+        type: 'danger', 
+        text: error.response?.data?.message || 'Failed to reset password. Please check your information and try again.' 
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -76,6 +117,7 @@ const ForgotPassword = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    disabled={isLoading}
                   />
                   <Form.Text className="text-muted">
                     We'll send a password reset code to this email.
@@ -83,8 +125,12 @@ const ForgotPassword = () => {
                 </Form.Group>
                 
                 <div className="d-grid gap-2 mb-3">
-                  <Button variant="primary" type="submit">
-                    Request Reset Code
+                  <Button 
+                    variant="primary" 
+                    type="submit"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Sending...' : 'Request Reset Code'}
                   </Button>
                 </div>
                 
@@ -104,6 +150,7 @@ const ForgotPassword = () => {
                     value={resetCode}
                     onChange={(e) => setResetCode(e.target.value)}
                     required
+                    disabled={isLoading}
                   />
                 </Form.Group>
                 
@@ -115,10 +162,11 @@ const ForgotPassword = () => {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
-                    minLength={8}
+                    minLength={6}
+                    disabled={isLoading}
                   />
                   <Form.Text className="text-muted">
-                    Password must be at least 8 characters.
+                    Password must be at least 6 characters.
                   </Form.Text>
                 </Form.Group>
                 
@@ -130,12 +178,17 @@ const ForgotPassword = () => {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
+                    disabled={isLoading}
                   />
                 </Form.Group>
                 
                 <div className="d-grid gap-2 mb-3">
-                  <Button variant="primary" type="submit">
-                    Reset Password
+                  <Button 
+                    variant="primary" 
+                    type="submit"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Processing...' : 'Reset Password'}
                   </Button>
                 </div>
                 
@@ -147,6 +200,7 @@ const ForgotPassword = () => {
                       setStep(1);
                       setMessage({ type: '', text: '' });
                     }}
+                    disabled={isLoading}
                   >
                     <FontAwesomeIcon icon={faArrowLeft} className="me-1" /> Back to Email Entry
                   </Button>

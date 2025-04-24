@@ -12,7 +12,7 @@ exports.registerUser = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { username, email, password, role } = req.body;
+  const { username, firstName, lastName, email, password, role } = req.body;
 
   try {
     // Check if user already exists
@@ -24,6 +24,8 @@ exports.registerUser = async (req, res) => {
     // Create a new user
     user = new User({
       username,
+      firstName,
+      lastName,
       email,
       password,
       role: role || 'buyer' // Default role is buyer
@@ -102,17 +104,130 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-// Get current user profile
-exports.getCurrentUser = async (req, res) => {
+// Forgot password - send reset code
+exports.forgotPassword = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { email } = req.body;
+
   try {
-    const user = await User.findById(req.user.id).select('-password');
+    // Find user by email
+    const user = await User.findOne({ email });
+    
+    // We don't want to reveal if email exists for security reasons
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(200).json({ 
+        message: 'If an account with this email exists, a password reset code has been sent.' 
+      });
     }
-    res.json(user);
+
+    // Generate a random 6-digit code
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Set reset code and expiration (1 hour from now)
+    user.resetPasswordCode = resetCode;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    
+    await user.save();
+
+    // In a real application, you would send an email with the code here
+    // For development, we'll just log it to the console
+    console.log(`Reset code for ${email}: ${resetCode}`);
+
+    // Return success message
+    res.status(200).json({ 
+      message: 'If an account with this email exists, a password reset code has been sent.' 
+    });
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
+  }
+};
+
+// Reset password with code
+exports.resetPassword = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { email, resetCode, newPassword } = req.body;
+
+  try {
+    // Find user by email
+    const user = await User.findOne({ 
+      email, 
+      resetPasswordCode: resetCode,
+      resetPasswordExpires: { $gt: Date.now() } // Make sure code hasn't expired
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired reset code' });
+    }
+
+    // Set new password and clear reset fields
+    user.password = newPassword;
+    user.resetPasswordCode = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    res.json({ message: 'Password has been reset successfully' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};
+
+// Get current user profile
+exports.getCurrentUser = async (req, res) => {
+  try {
+    console.log('Getting user profile for user ID:', req.user.id);
+    
+    const user = await User.findById(req.user.id).select('-password');
+    
+    if (!user) {
+      console.log('User not found with ID:', req.user.id);
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    // Log profile image details if it exists
+    if (user.profileImage && user.profileImage.data) {
+      console.log('User has profile image:', {
+        contentType: user.profileImage.contentType,
+        dataSize: user.profileImage.data.length || 'unknown'
+      });
+      
+      // Convert buffer to base64 for immediate use in frontend
+      try {
+        const imageBase64 = user.profileImage.data.toString('base64');
+        
+        // Create a user response with enhanced profile image
+        const userResponse = user.toObject();
+        
+        // Replace the profile image data with the base64 preview
+        userResponse.profileImage = {
+          ...userResponse.profileImage,
+          preview: `data:${user.profileImage.contentType};base64,${imageBase64}`
+        };
+        
+        console.log('Returning user profile with image preview successfully');
+        return res.json(userResponse);
+      } catch (err) {
+        console.error('Error converting profile image to base64:', err);
+      }
+    } else {
+      console.log('User has no profile image');
+    }
+    
+    console.log('Returning user profile successfully');
+    res.json(user);
+  } catch (err) {
+    console.error('Error in getCurrentUser:', err);
+    res.status(500).json({ message: 'Server error retrieving user profile' });
   }
 };
 
@@ -125,11 +240,13 @@ exports.updateUserProfile = async (req, res) => {
 
   const {
     username,
+    firstName,
+    lastName,
     email,
     phone,
     address,
     bio,
-    profileImage,
+    petPreferences,
     ngoDetails
   } = req.body;
 
@@ -137,11 +254,13 @@ exports.updateUserProfile = async (req, res) => {
     // Build update object
     const userFields = {};
     if (username) userFields.username = username;
+    if (firstName) userFields.firstName = firstName;
+    if (lastName) userFields.lastName = lastName;
     if (email) userFields.email = email;
     if (phone) userFields.phone = phone;
     if (address) userFields.address = address;
     if (bio) userFields.bio = bio;
-    if (profileImage) userFields.profileImage = profileImage;
+    if (petPreferences) userFields.petPreferences = petPreferences;
     
     // Only update NGO details if the user is an NGO
     const user = await User.findById(req.user.id);
@@ -160,6 +279,75 @@ exports.updateUserProfile = async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
+  }
+};
+
+// Upload profile image
+exports.uploadProfileImage = async (req, res) => {
+  try {
+    console.log('Received profile image upload request');
+    console.log('Request headers:', req.headers);
+    console.log('Files in request:', req.files ? 'yes' : 'no');
+    console.log('Single file in request:', req.file ? 'yes' : 'no');
+    
+    // Check if file exists
+    if (!req.file) {
+      console.log('No file found in request');
+      return res.status(400).json({ message: 'No image file uploaded' });
+    }
+    
+    console.log('File details:', {
+      filename: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+      buffer: req.file.buffer ? 'present' : 'missing'
+    });
+    
+    // If no buffer is present, we can't process the image
+    if (!req.file.buffer) {
+      return res.status(400).json({ message: 'No image data found in uploaded file' });
+    }
+    
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      console.log('User not found:', req.user.id);
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    console.log('User found, updating profile image');
+    
+    // Store image directly in MongoDB
+    user.profileImage = {
+      data: req.file.buffer,
+      contentType: req.file.mimetype
+    };
+    
+    // Save the user with the new image
+    await user.save();
+    console.log('Profile image saved successfully');
+    
+    // Convert the image to base64 for immediate display in frontend
+    // This avoids the need for a separate image fetch
+    const imageBase64 = req.file.buffer.toString('base64');
+    
+    // Return the updated user (excluding password) with the image preview
+    const updatedUser = await User.findById(req.user.id).select('-password');
+    
+    // Create a simplified response that's easier for the frontend to use
+    res.json({ 
+      message: 'Profile image uploaded successfully',
+      user: {
+        ...updatedUser.toObject(),
+        profileImage: {
+          ...updatedUser.profileImage,
+          // Add the base64 encoded image for immediate display
+          preview: `data:${req.file.mimetype};base64,${imageBase64}`
+        }
+      }
+    });
+  } catch (err) {
+    console.error('Error uploading profile image:', err);
+    res.status(500).json({ message: 'Server error uploading image' });
   }
 };
 

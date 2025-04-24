@@ -3,7 +3,13 @@ const jwt = require('jsonwebtoken');
 // Middleware to authenticate JWT token
 const auth = (req, res, next) => {
   // Get token from header
-  const token = req.header('x-auth-token');
+  let token = req.header('x-auth-token') || req.header('Authorization');
+
+  // Check if token is in Bearer format
+  if (token && token.startsWith('Bearer ')) {
+    // Remove Bearer from string
+    token = token.split(' ')[1];
+  }
 
   // Check if no token
   if (!token) {
