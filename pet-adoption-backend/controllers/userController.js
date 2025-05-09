@@ -503,3 +503,72 @@ exports.removeFromFavorites = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+
+// Get user's cart
+exports.getCart = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id)
+      .populate('cart.items.product', 'name price images stock');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Calculate total
+    const total = user.cart.items.reduce((sum, item) => {
+      return sum + (item.product.price * item.quantity);
+    }, 0);
+
+    // Update total in user's cart
+    user.cart.total = total;
+    await user.save();
+
+    res.json(user.cart);
+  } catch (err) {
+    console.error('Error in getCart:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Update user's cart
+exports.setCart = async (req, res) => {
+  try {
+    const { cart } = req.body;
+    console.log('setCart called for user:', req.user.id, 'with cart:', JSON.stringify(cart));
+
+    // Validate cart structure
+    if (!cart || !Array.isArray(cart.items)) {
+      return res.status(400).json({ message: 'Invalid cart format' });
+    }
+
+    // Validate each item
+    for (const item of cart.items) {
+      if (!item.product || !item.quantity || item.quantity < 1) {
+        return res.status(400).json({ message: 'Invalid cart item format' });
+      }
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Update cart
+    user.cart = cart;
+
+    // Calculate total
+    const populatedUser = await user.populate('cart.items.product', 'price');
+    const total = populatedUser.cart.items.reduce((sum, item) => {
+      return sum + (item.product.price * item.quantity);
+    }, 0);
+
+    // Update total
+    user.cart.total = total;
+    await user.save();
+
+    res.json(user.cart);
+  } catch (err) {
+    console.error('Error in setCart:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};

@@ -88,7 +88,9 @@ export const userAPI = {
   },
   getUserById: userId => api.get(`/users/${userId}`),
   addToFavorites: (type, id) => api.post('/users/favorites', { type, id }),
-  removeFromFavorites: (type, id) => api.delete('/users/favorites', { data: { type, id } })
+  removeFromFavorites: (type, id) => api.delete('/users/favorites', { data: { type, id } }),
+  getCart: () => api.get('/users/cart'),
+  setCart: (cart) => api.post('/users/cart', { cart }),
 };
 
 // Pet API calls

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth');
+const { auth } = require('../middleware/auth');
 const Shop = require('../models/Shop');
 const multer = require('multer');
 const path = require('path');

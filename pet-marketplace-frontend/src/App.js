@@ -24,11 +24,14 @@ import MyPets from './pages/MyPets';
 import MyProducts from './pages/MyProducts';
 import UserProfile from './pages/UserProfile';
 import NotFound from './pages/NotFound';
+import Cart from './pages/Cart';
 
 // Seller components
 import SellerRegister from './components/auth/SellerRegister';
 import SellerDashboard from './components/seller/SellerDashboard';
 import ShopForm from './components/seller/ShopForm';
+import AddProduct from './components/seller/AddProduct';
+import ShopDashboard from './components/seller/ShopDashboard';
 
 // Protected route component
 import ProtectedRoute from './components/common/ProtectedRoute';
@@ -98,6 +101,7 @@ function App() {
               <UserProfile />
             </ProtectedRoute>
           } />
+          <Route path="/cart" element={<Cart />} />
           
           {/* Seller routes */}
           <Route path="/seller/register" element={<SellerRegister />} />
@@ -122,6 +126,22 @@ function App() {
             element={
               <PrivateRoute role="seller">
                 <ShopForm isEdit={true} />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/seller/add-product"
+            element={
+              <PrivateRoute role="seller">
+                <AddProduct />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/seller/shop-dashboard"
+            element={
+              <PrivateRoute role="seller">
+                <ShopDashboard />
               </PrivateRoute>
             }
           />

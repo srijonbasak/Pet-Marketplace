@@ -32,6 +32,11 @@ const productSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  shop: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Shop',
+    required: true
+  },
   ratings: [{
     user: {
       type: mongoose.Schema.Types.ObjectId,

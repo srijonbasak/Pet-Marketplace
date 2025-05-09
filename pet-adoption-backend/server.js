@@ -36,6 +36,8 @@ app.use('/api/pets', require('./routes/petRoutes'));
 app.use('/api/adoptions', require('./routes/adoptionRoutes'));
 app.use('/api/rescues', require('./routes/rescueRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
+app.use('/api/shops', require('./routes/shopRoutes'));
+app.use('/api/orders', require('./routes/orderRoutes'));
 
 // Static folder for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { userAPI } from '../services/api';
+import { CartProvider } from './CartContext';
 
 // Create and export the context
 export const AuthContext = createContext();
@@ -108,7 +109,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {!loading ? <CartProvider>{children}</CartProvider> : null}
     </AuthContext.Provider>
   );
 };

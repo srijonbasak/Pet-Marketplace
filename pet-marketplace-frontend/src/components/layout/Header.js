@@ -1,12 +1,14 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Container, Navbar, Nav, NavDropdown } from 'react-bootstrap';
+import { Container, Navbar, Nav, NavDropdown, Badge } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaw, faShoppingCart, faUser, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../../hooks/useAuth';
+import { useCart } from '../../context/CartContext';
 
 const Header = () => {
   const { isAuthenticated, currentUser, logout } = useAuth();
+  const { cart } = useCart();
 
   return (
     <Navbar expand="lg" bg="primary" variant="dark" sticky="top" className="mb-4">
@@ -23,6 +25,14 @@ const Header = () => {
             <Nav.Link as={NavLink} to="/rescues">Rescues</Nav.Link>
           </Nav>
           <Nav>
+            <Nav.Link as={NavLink} to="/cart" className="position-relative">
+              <FontAwesomeIcon icon={faShoppingCart} />
+              {cart.length > 0 && (
+                <Badge bg="danger" pill className="position-absolute top-0 start-100 translate-middle">
+                  {cart.length}
+                </Badge>
+              )}
+            </Nav.Link>
             {isAuthenticated ? (
               <>
                 <NavDropdown title={
@@ -54,11 +64,6 @@ const Header = () => {
                     Logout
                   </NavDropdown.Item>
                 </NavDropdown>
-                {currentUser?.role === 'buyer' && (
-                  <Nav.Link as={NavLink} to="/cart">
-                    <FontAwesomeIcon icon={faShoppingCart} />
-                  </Nav.Link>
-                )}
               </>
             ) : (
               <>

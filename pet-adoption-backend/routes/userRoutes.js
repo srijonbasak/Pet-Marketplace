@@ -230,4 +230,20 @@ router.post(
   userController.uploadProfileImage
 );
 
+// @route   GET /api/users/cart
+// @desc    Get current user's cart
+// @access  Private
+router.get('/cart', auth, (req, res, next) => {
+  console.log('GET /api/users/cart route hit');
+  next();
+}, userController.getCart);
+
+// @route   POST /api/users/cart
+// @desc    Update current user's cart
+// @access  Private
+router.post('/cart', auth, (req, res, next) => {
+  console.log('POST /api/users/cart route hit');
+  next();
+}, userController.setCart);
+
 module.exports = router; 

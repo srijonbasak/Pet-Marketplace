@@ -126,9 +126,13 @@ const SellerDashboard = () => {
                       </p>
                     </Col>
                     <Col md={4} className="text-end">
-                      <Button variant="primary" onClick={handleEditShop}>
+                      <Button variant="primary" onClick={handleEditShop} className="me-2">
                         <i className="fas fa-edit me-2"></i>
                         Edit Shop
+                      </Button>
+                      <Button variant="secondary" onClick={() => navigate('/seller/shop-dashboard')}>
+                        <i className="fas fa-store me-2"></i>
+                        Shop Dashboard
                       </Button>
                     </Col>
                   </Row>
