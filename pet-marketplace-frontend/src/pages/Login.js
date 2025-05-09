@@ -11,18 +11,9 @@ const Login = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  const { login, isAuthenticated } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  
-  const from = location.state?.from?.pathname || '/dashboard';
-
-  // Redirect if already logged in
-  React.useEffect(() => {
-    if (isAuthenticated) {
-      navigate(from, { replace: true });
-    }
-  }, [isAuthenticated, navigate, from]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,10 +26,23 @@ const Login = () => {
     try {
       setError('');
       setIsLoading(true);
-      const success = await login(email, password);
-      
-      if (success) {
-        navigate(from, { replace: true });
+      const res = await login(email, password);
+      console.log('Login response:', res);
+      if (res && res.user) {
+        // Redirect based on role immediately after login
+        switch (res.user.role) {
+          case 'seller':
+            navigate('/seller/dashboard', { replace: true });
+            break;
+          case 'ngo':
+            navigate('/ngo/dashboard', { replace: true });
+            break;
+          case 'employee':
+            navigate('/employee/dashboard', { replace: true });
+            break;
+          default:
+            navigate('/dashboard', { replace: true });
+        }
       }
     } catch (err) {
       setError('Failed to log in. Please try again.');

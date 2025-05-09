@@ -1,114 +1,93 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 import { toast } from 'react-toastify';
-import authService from '../services/auth';
 import { userAPI } from '../services/api';
 
+// Create and export the context
 export const AuthContext = createContext();
 
+export const useAuth = () => {
+  return useContext(AuthContext);
+};
+
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
+  const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuthStatus = async () => {
-      console.log('Checking authentication status...');
-      if (authService.isAuthenticated()) {
-        console.log('Token is valid, fetching user data');
-        
+    const checkAuth = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
         try {
-          // Get current user data
-          const res = await userAPI.getCurrentUser();
-          setCurrentUser(res.data);
+          const config = {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          };
+          const res = await axios.get('/api/users/me', config);
+          setUser(res.data);
           setIsAuthenticated(true);
-          console.log('User authenticated successfully');
-        } catch (err) {
-          console.error('Error fetching user data:', err);
-          authService.removeToken();
+        } catch (error) {
+          localStorage.removeItem('token');
+          setUser(null);
           setIsAuthenticated(false);
-          setCurrentUser(null);
         }
-      } else {
-        console.log('No valid token found');
-        authService.removeToken(); // Clean up any invalid tokens
-        setIsAuthenticated(false);
-        setCurrentUser(null);
       }
-      
-      setIsLoading(false);
+      setLoading(false);
     };
 
-    checkAuthStatus();
+    checkAuth();
   }, []);
 
-  // Login user
   const login = async (email, password) => {
     try {
-      console.log('Attempting login with email:', email);
-      await authService.login({ email, password });
-      
-      // Get user info
-      const userRes = await userAPI.getCurrentUser();
-      setCurrentUser(userRes.data);
+      const res = await axios.post('/api/users/login', { email, password });
+      localStorage.setItem('token', res.data.token);
+      setUser(res.data.user);
       setIsAuthenticated(true);
-      
-      console.log('Login successful');
       toast.success('Login successful!');
-      return true;
-    } catch (err) {
-      console.error('Login error:', err);
-      const errorMsg = err.response && err.response.data.message 
-        ? err.response.data.message 
+      return res.data;
+    } catch (error) {
+      const errorMsg = error.response && error.response.data.message 
+        ? error.response.data.message 
         : 'Login failed. Please try again.';
       toast.error(errorMsg);
-      return false;
+      throw error.response.data;
     }
   };
 
-  // Register user
   const register = async (userData) => {
     try {
-      console.log('Attempting to register user');
-      await authService.register(userData);
-      
-      // Get user info
-      const userRes = await userAPI.getCurrentUser();
-      setCurrentUser(userRes.data);
+      const res = await axios.post('/api/users/register', userData);
+      localStorage.setItem('token', res.data.token);
+      setUser(res.data.user);
       setIsAuthenticated(true);
-      
-      console.log('Registration successful');
       toast.success('Registration successful!');
-      return true;
-    } catch (err) {
-      console.error('Registration error:', err);
-      const errorMsg = err.response && err.response.data.message 
-        ? err.response.data.message 
+      return res.data;
+    } catch (error) {
+      const errorMsg = error.response && error.response.data.message 
+        ? error.response.data.message 
         : 'Registration failed. Please try again.';
       toast.error(errorMsg);
-      return false;
+      throw error.response.data;
     }
   };
 
-  // Logout user
   const logout = () => {
-    console.log('Logging out user');
-    authService.logout();
-    setCurrentUser(null);
+    localStorage.removeItem('token');
+    setUser(null);
     setIsAuthenticated(false);
     toast.info('Logged out successfully');
   };
 
-  // Update user
   const updateProfile = async (userData) => {
     try {
-      console.log('Updating user profile');
       const res = await userAPI.updateProfile(userData);
-      setCurrentUser(res.data);
-      console.log('Profile updated successfully');
+      setUser(res.data);
       toast.success('Profile updated successfully');
       return true;
     } catch (err) {
-      console.error('Profile update error:', err);
       const errorMsg = err.response && err.response.data.message 
         ? err.response.data.message 
         : 'Profile update failed. Please try again.';
@@ -118,9 +97,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   const value = {
-    currentUser, 
+    user,
     isAuthenticated,
-    isLoading,
+    loading,
     login,
     register,
     logout,
@@ -129,7 +108,9 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={value}>
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
-}; 
+};
+
+export default AuthContext; 

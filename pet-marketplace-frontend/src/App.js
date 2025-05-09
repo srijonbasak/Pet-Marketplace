@@ -25,8 +25,17 @@ import MyProducts from './pages/MyProducts';
 import UserProfile from './pages/UserProfile';
 import NotFound from './pages/NotFound';
 
+// Seller components
+import SellerRegister from './components/auth/SellerRegister';
+import SellerDashboard from './components/seller/SellerDashboard';
+import ShopForm from './components/seller/ShopForm';
+
 // Protected route component
 import ProtectedRoute from './components/common/ProtectedRoute';
+import PrivateRoute from './components/common/PrivateRoute';
+
+import NgoDashboard from './components/ngo/NgoDashboard';
+import EmployeeDashboard from './components/employee/EmployeeDashboard';
 
 function App() {
   const { isLoading } = useAuth();
@@ -60,9 +69,9 @@ function App() {
           
           {/* Protected routes */}
           <Route path="/dashboard" element={
-            <ProtectedRoute>
+            <PrivateRoute role="buyer">
               <Dashboard />
-            </ProtectedRoute>
+            </PrivateRoute>
           } />
           <Route path="/pets/:id/adopt" element={
             <ProtectedRoute>
@@ -89,6 +98,53 @@ function App() {
               <UserProfile />
             </ProtectedRoute>
           } />
+          
+          {/* Seller routes */}
+          <Route path="/seller/register" element={<SellerRegister />} />
+          <Route
+            path="/seller/dashboard"
+            element={
+              <PrivateRoute role="seller">
+                <SellerDashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/seller/create-shop"
+            element={
+              <PrivateRoute role="seller">
+                <ShopForm />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/seller/edit-shop"
+            element={
+              <PrivateRoute role="seller">
+                <ShopForm isEdit={true} />
+              </PrivateRoute>
+            }
+          />
+          
+          {/* NGO routes */}
+          <Route
+            path="/ngo/dashboard"
+            element={
+              <PrivateRoute role="ngo">
+                <NgoDashboard />
+              </PrivateRoute>
+            }
+          />
+          
+          {/* Employee routes */}
+          <Route
+            path="/employee/dashboard"
+            element={
+              <PrivateRoute role="employee">
+                <EmployeeDashboard />
+              </PrivateRoute>
+            }
+          />
           
           {/* 404 route */}
           <Route path="*" element={<NotFound />} />

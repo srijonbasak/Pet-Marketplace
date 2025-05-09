@@ -1,6 +1,7 @@
 const Pet = require('../models/Pet');
 const Adoption = require('../models/Adoption');
 const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
 
 // Get all pets with filters
 exports.getPets = async (req, res) => {
@@ -60,6 +61,11 @@ exports.getPets = async (req, res) => {
 // Get a single pet by ID
 exports.getPetById = async (req, res) => {
   try {
+    // Check if the id is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({ message: 'Pet not found' });
+    }
+
     const pet = await Pet.findById(req.params.id)
       .populate('provider', 'username email role phone');
     
@@ -70,9 +76,6 @@ exports.getPetById = async (req, res) => {
     res.json(pet);
   } catch (err) {
     console.error(err);
-    if (err.kind === 'ObjectId') {
-      return res.status(404).json({ message: 'Pet not found' });
-    }
     res.status(500).json({ message: 'Server error' });
   }
 };

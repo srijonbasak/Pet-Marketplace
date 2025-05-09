@@ -50,10 +50,22 @@ const Register = () => {
       setIsLoading(true);
       
       const userData = { username, email, password, role };
-      const success = await register(userData);
-      
-      if (success) {
-        navigate('/dashboard');
+      const res = await register(userData);
+      if (res && res.user) {
+        // Redirect based on role
+        switch (res.user.role) {
+          case 'seller':
+            navigate('/seller/dashboard');
+            break;
+          case 'ngo':
+            navigate('/ngo/dashboard');
+            break;
+          case 'employee':
+            navigate('/employee/dashboard');
+            break;
+          default:
+            navigate('/dashboard');
+        }
       }
     } catch (err) {
       setError('Registration failed. Please try again.');
@@ -151,6 +163,7 @@ const Register = () => {
                     <option value="buyer">Pet Buyer/Adopter</option>
                     <option value="seller">Pet Seller</option>
                     <option value="ngo">NGO/Rescue Organization</option>
+                    <option value="employee">Employee</option>
                   </Form.Select>
                 </Form.Group>
                 
