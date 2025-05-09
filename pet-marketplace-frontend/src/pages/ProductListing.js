@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Spinner, Alert, Pagination } from 'react-bootstrap';
+import { Container, Row, Col, Card, Spinner, Alert, Pagination, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { productAPI } from '../services/api';
+import { useCart } from '../context/CartContext';
 
 const PRODUCTS_PER_PAGE = 6;
 
@@ -11,6 +12,7 @@ const ProductListing = () => {
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -54,7 +56,7 @@ const ProductListing = () => {
           <Row>
             {paginatedProducts.map(product => (
               <Col key={product._id} md={4} sm={6} className="mb-4">
-                <Card className="h-100 product-card" style={{ cursor: 'pointer' }} onClick={() => navigate(`/products/${product._id}`)}>
+                <Card className="h-100 product-card">
                   {product.images && product.images[0] && (
                     <Card.Img
                       variant="top"
@@ -70,6 +72,17 @@ const ProductListing = () => {
                       <strong>Price:</strong> ${product.price}<br />
                       <strong>Stock:</strong> {product.stock}
                     </Card.Text>
+                    <div className="d-flex gap-2 mt-3">
+                      <Button variant="primary" onClick={() => addToCart(product)}>
+                        Add to Cart
+                      </Button>
+                      <Button variant="success" onClick={() => { addToCart(product); navigate('/cart'); }}>
+                        Buy Now
+                      </Button>
+                      <Button variant="outline-secondary" onClick={() => navigate(`/products/${product._id}`)}>
+                        View Details
+                      </Button>
+                    </div>
                   </Card.Body>
                 </Card>
               </Col>
