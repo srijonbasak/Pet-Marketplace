@@ -25,6 +25,7 @@ import MyProducts from './pages/MyProducts';
 import UserProfile from './pages/UserProfile';
 import NotFound from './pages/NotFound';
 import Cart from './pages/Cart';
+import ShopPage from './pages/ShopPage';
 
 // Seller components
 import SellerRegister from './components/auth/SellerRegister';
@@ -165,6 +166,9 @@ function App() {
               </PrivateRoute>
             }
           />
+          
+          {/* Shop routes */}
+          <Route path="/shop/:shopname" element={<ShopPage />} />
           
           {/* 404 route */}
           <Route path="*" element={<NotFound />} />

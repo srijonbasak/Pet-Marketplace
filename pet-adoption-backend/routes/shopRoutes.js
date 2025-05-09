@@ -4,6 +4,7 @@ const { auth } = require('../middleware/auth');
 const Shop = require('../models/Shop');
 const multer = require('multer');
 const path = require('path');
+const Product = require('../models/Product');
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -109,6 +110,25 @@ router.get('/:id', async (req, res) => {
     res.json(shop);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+});
+
+// Get shop and all products by shopname (slug)
+router.get('/by-name/:shopname', async (req, res) => {
+  try {
+    // Try to find by slug, fallback to name (URL-decoded)
+    const shop = await Shop.findOne({
+      $or: [
+        { slug: req.params.shopname },
+        { shopname: req.params.shopname },
+        { name: new RegExp('^' + req.params.shopname.replace(/-/g, ' '), 'i') }
+      ]
+    });
+    if (!shop) return res.status(404).json({ message: 'Shop not found' });
+    const products = await Product.find({ shop: shop._id });
+    res.json({ shop, products });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

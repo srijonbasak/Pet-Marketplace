@@ -130,9 +130,16 @@ const SellerDashboard = () => {
                         <i className="fas fa-edit me-2"></i>
                         Edit Shop
                       </Button>
-                      <Button variant="secondary" onClick={() => navigate('/seller/shop-dashboard')}>
+                      <Button variant="secondary" onClick={() => navigate('/seller/shop-dashboard')} className="me-2">
                         <i className="fas fa-store me-2"></i>
                         Shop Dashboard
+                      </Button>
+                      <Button
+                        variant="outline-primary"
+                        onClick={() => window.open(`/shop/${shop.name.replace(/\s+/g, '-').toLowerCase()}`, '_blank')}
+                      >
+                        <i className="fas fa-external-link-alt me-2"></i>
+                        View Shop Page
                       </Button>
                     </Col>
                   </Row>
