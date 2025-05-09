@@ -6,7 +6,7 @@ const rescueSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  ngo: {
+  createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
@@ -172,6 +172,7 @@ const rescueSchema = new mongoose.Schema({
     challenges: [String],
     summary: String
   },
+  imageUrl: { type: String },
   createdAt: {
     type: Date,
     default: Date.now

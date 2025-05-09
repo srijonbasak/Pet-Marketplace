@@ -40,7 +40,7 @@ exports.getRescues = async (req, res) => {
       .sort(sortOption)
       .limit(parseInt(limit))
       .skip(skip)
-      .populate('ngo', 'username email role ngoDetails')
+      .populate('createdBy', 'username email role ngoDetails')
       .populate('team.member', 'username');
     
     // Get total count for pagination
@@ -65,7 +65,7 @@ exports.getRescues = async (req, res) => {
 exports.getRescueById = async (req, res) => {
   try {
     const rescue = await Rescue.findById(req.params.id)
-      .populate('ngo', 'username email role ngoDetails')
+      .populate('createdBy', 'username email role ngoDetails')
       .populate('team.member', 'username')
       .populate('funding.donations.donor', 'username')
       .populate('updates.author', 'username');
@@ -92,22 +92,20 @@ exports.createRescue = async (req, res) => {
   }
   
   try {
-    // Only NGOs and admins can create rescue operations
-    if (req.user.role !== 'ngo' && req.user.role !== 'admin') {
-      return res.status(401).json({ message: 'Not authorized. Only NGOs can create rescue operations' });
-    }
-    
-    // Set the NGO to the current user if they are an NGO, otherwise use the provided NGO ID
-    const ngoId = req.user.role === 'ngo' ? req.user.id : req.body.ngo;
-    
-    // Create new rescue operation
-    const newRescue = new Rescue({
-      ...req.body,
-      ngo: ngoId
+    // Allow all authenticated users to create a rescue
+    const { title, description, location, rescueDate, imageUrl } = req.body;
+    const rescue = new Rescue({
+      title,
+      description,
+      location,
+      imageUrl,
+      rescueDate: {
+        planned: rescueDate.planned,
+        actual: null
+      },
+      createdBy: req.user.id
     });
-    
-    const rescue = await newRescue.save();
-    
+    await rescue.save();
     res.status(201).json(rescue);
   } catch (err) {
     console.error(err);
@@ -129,13 +127,13 @@ exports.updateRescue = async (req, res) => {
       return res.status(404).json({ message: 'Rescue operation not found' });
     }
     
-    // Check authorization - only the NGO that created the rescue or an admin can update it
-    if (rescue.ngo.toString() !== req.user.id && req.user.role !== 'admin') {
+    // Check authorization - only the creator or an admin can update
+    if (rescue.createdBy.toString() !== req.user.id && req.user.role !== 'admin') {
       return res.status(401).json({ message: 'Not authorized' });
     }
     
-    // Don't allow changing the NGO
-    const { ngo, ...updateData } = req.body;
+    // Don't allow changing the creator
+    const { createdBy, ...updateData } = req.body;
     
     const updatedRescue = await Rescue.findByIdAndUpdate(
       req.params.id,
@@ -169,8 +167,8 @@ exports.updateRescueStatus = async (req, res) => {
       return res.status(404).json({ message: 'Rescue operation not found' });
     }
     
-    // Check authorization - only the NGO that created the rescue or an admin can update it
-    if (rescue.ngo.toString() !== req.user.id && req.user.role !== 'admin') {
+    // Check authorization - only the creator or an admin can update
+    if (rescue.createdBy.toString() !== req.user.id && req.user.role !== 'admin') {
       return res.status(401).json({ message: 'Not authorized' });
     }
     

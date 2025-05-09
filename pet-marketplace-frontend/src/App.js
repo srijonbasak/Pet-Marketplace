@@ -26,6 +26,7 @@ import UserProfile from './pages/UserProfile';
 import NotFound from './pages/NotFound';
 import Cart from './pages/Cart';
 import ShopPage from './pages/ShopPage';
+import CreateRescue from './pages/CreateRescue';
 
 // Seller components
 import SellerRegister from './components/auth/SellerRegister';
@@ -71,6 +72,7 @@ function App() {
           <Route path="/products" element={<ProductListing />} />
           <Route path="/products/:id" element={<ProductDetails />} />
           <Route path="/rescues" element={<RescueOperations />} />
+          <Route path="/rescues/new" element={<CreateRescue />} />
           <Route path="/rescues/:id" element={<RescueDetails />} />
           
           {/* Protected routes */}

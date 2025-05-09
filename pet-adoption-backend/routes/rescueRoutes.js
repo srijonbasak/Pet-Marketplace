@@ -21,16 +21,12 @@ router.post(
   '/',
   [
     auth,
-    isNGO,
     check('title', 'Title is required').not().isEmpty(),
+    check('description', 'Description is required').not().isEmpty(),
     check('location.city', 'City is required').not().isEmpty(),
     check('location.state', 'State is required').not().isEmpty(),
     check('location.country', 'Country is required').not().isEmpty(),
-    check('description', 'Description is required').not().isEmpty(),
-    check('rescueDate.planned', 'Planned rescue date is required').not().isEmpty(),
-    check('animals', 'At least one animal type must be included').isArray().notEmpty(),
-    check('animals.*.species', 'Species is required for each animal').not().isEmpty(),
-    check('animals.*.count', 'Count is required for each animal').isNumeric()
+    check('imageUrl', 'Image URL is required').not().isEmpty()
   ],
   rescueController.createRescue
 );
