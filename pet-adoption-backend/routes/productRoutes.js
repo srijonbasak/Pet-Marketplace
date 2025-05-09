@@ -67,8 +67,24 @@ router.put('/:id', auth, (req, res) => {
 // @route   DELETE /api/products/:id
 // @desc    Delete a product
 // @access  Private - Owner or Admin
-router.delete('/:id', auth, (req, res) => {
-  res.json({ message: `Delete product with ID: ${req.params.id}` });
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    // Check if the user is the seller or an admin
+    if (product.seller.toString() !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Not authorized to delete this product' });
+    }
+
+    await Product.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Product deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 module.exports = router; 

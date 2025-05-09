@@ -21,12 +21,14 @@ const ShopDashboard = () => {
         setShop(shopRes.data);
         // Fetch products for this shop
         const productsRes = await axios.get(`/api/products?shop=${shopRes.data._id}`, config);
-        setProducts(Array.isArray(productsRes.data) ? productsRes.data : []);
+        setProducts(Array.isArray(productsRes.data) ? productsRes.data.filter(p => p !== null) : []);
         // Fetch orders for this shop (placeholder endpoint)
         const ordersRes = await axios.get(`/api/orders?seller=${shopRes.data._id}`, config);
-        setOrders(Array.isArray(ordersRes.data) ? ordersRes.data : []);
+        setOrders(Array.isArray(ordersRes.data) ? ordersRes.data.filter(o => o !== null) : []);
       } catch (err) {
         setError('Failed to fetch shop, products, or orders.');
+        setProducts([]);
+        setOrders([]);
       } finally {
         setLoading(false);
       }
@@ -99,15 +101,15 @@ const ShopDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {products.length === 0 ? (
+              {!products || products.length === 0 ? (
                 <tr><td colSpan="5" className="text-center">No products found.</td></tr>
               ) : (
-                products.map(product => (
+                products.map(product => product && (
                   <tr key={product._id}>
-                    <td>{product.name}</td>
-                    <td>{product.category}</td>
-                    <td>${product.price}</td>
-                    <td>{product.stock}</td>
+                    <td>{product.name || 'Unnamed Product'}</td>
+                    <td>{product.category || 'Uncategorized'}</td>
+                    <td>${product.price || 0}</td>
+                    <td>{product.stock || 0}</td>
                     <td>
                       <Button variant="info" size="sm" className="me-2" onClick={() => handleEdit(product._id)}>Edit</Button>
                       <Button variant="danger" size="sm" onClick={() => handleDelete(product._id)}>Delete</Button>
@@ -132,21 +134,21 @@ const ShopDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {orders.length === 0 ? (
+              {!orders || orders.length === 0 ? (
                 <tr><td colSpan="6" className="text-center">No orders found.</td></tr>
               ) : (
-                orders.map(order => (
+                orders.map(order => order && (
                   <tr key={order._id}>
                     <td>{order._id}</td>
                     <td>{order.buyer?.name || order.buyer?.email || 'N/A'}</td>
                     <td>
-                      {order.items.map(item => (
-                        <div key={item.product._id}>
-                          {item.product.name} x {item.quantity}
+                      {order.items && order.items.map(item => item && item.product && (
+                        <div key={item.product._id || Math.random()}>
+                          {item.product.name || 'Unknown Product'} x {item.quantity || 0}
                         </div>
                       ))}
                     </td>
-                    <td>{order.paymentMethod}</td>
+                    <td>{order.paymentMethod || 'N/A'}</td>
                     <td>
                       <Form.Select
                         size="sm"
@@ -159,7 +161,7 @@ const ShopDashboard = () => {
                         <option value="Cancelled">Cancelled</option>
                       </Form.Select>
                     </td>
-                    <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                    <td>{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}</td>
                   </tr>
                 ))
               )}
