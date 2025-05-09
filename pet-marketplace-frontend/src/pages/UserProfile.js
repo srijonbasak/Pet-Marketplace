@@ -18,7 +18,7 @@ const UserProfile = () => {
   const fileInputRef = useRef(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   
-  const { currentUser, isAuthenticated, logout } = useAuth();
+  const { user: authUser, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {

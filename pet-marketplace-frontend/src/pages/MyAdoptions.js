@@ -3,36 +3,27 @@ import { Container, Table, Badge, Card, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaw, faEye } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
 
 const MyAdoptions = () => {
   const [adoptions, setAdoptions] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading adoptions
-    setTimeout(() => {
-      setAdoptions([
-        {
-          _id: 'adoption1',
-          petId: 'pet1',
-          petName: 'Max',
-          petImage: 'https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-          providerName: 'Happy Paws Rescue',
-          status: 'pending',
-          submittedDate: '2023-08-15'
-        },
-        {
-          _id: 'adoption2',
-          petId: 'pet2',
-          petName: 'Luna',
-          petImage: 'https://images.unsplash.com/photo-1592194996308-7b43878e84a6?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-          providerName: 'Pet Haven',
-          status: 'approved',
-          submittedDate: '2023-07-20'
-        }
-      ]);
+    const fetchAdoptions = async () => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get('/api/adoptions', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setAdoptions(res.data.adoptions || []);
+      } catch (err) {
+        setAdoptions([]);
+      }
       setLoading(false);
-    }, 1000);
+    };
+    fetchAdoptions();
   }, []);
 
   const renderStatusBadge = (status) => {
@@ -93,25 +84,23 @@ const MyAdoptions = () => {
                   <tr key={adoption._id}>
                     <td>
                       <div className="d-flex align-items-center">
-                        <img 
-                          src={adoption.petImage} 
-                          alt={adoption.petName}
+                        <img
+                          src={adoption.pet?.images?.[0] || 'https://via.placeholder.com/40x40?text=No+Image'}
+                          alt={adoption.pet?.name}
                           style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '50%' }}
                           className="me-2"
                         />
-                        <Link to={`/pets/${adoption.petId}`}>
-                          {adoption.petName}
-                        </Link>
+                        <Link to={`/pets/${adoption.pet?._id}`}>{adoption.pet?.name}</Link>
                       </div>
                     </td>
-                    <td>{adoption.providerName}</td>
-                    <td>{new Date(adoption.submittedDate).toLocaleDateString()}</td>
+                    <td>{adoption.provider?.username}</td>
+                    <td>{adoption.applicationDate ? new Date(adoption.applicationDate).toLocaleDateString() : ''}</td>
                     <td>{renderStatusBadge(adoption.status)}</td>
                     <td>
-                      <Button 
-                        as={Link} 
-                        to={`/adoptions/${adoption._id}`} 
-                        variant="outline-primary" 
+                      <Button
+                        as={Link}
+                        to={`/adoptions/${adoption._id}`}
+                        variant="outline-primary"
                         size="sm"
                       >
                         <FontAwesomeIcon icon={faEye} className="me-1" />

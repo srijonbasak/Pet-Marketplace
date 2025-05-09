@@ -15,6 +15,11 @@ const AdoptionForm = () => {
     phone: '',
     housingType: '',
     hasYard: '',
+    hasChildren: '',
+    hasOtherPets: '',
+    otherPetsDetails: '',
+    workSchedule: '',
+    experience: '',
     reason: ''
   });
   const [error, setError] = useState('');
@@ -54,8 +59,12 @@ const AdoptionForm = () => {
         applicationDetails: {
           livingArrangement: form.housingType,
           hasYard: form.hasYard === 'yes',
+          hasChildren: form.hasChildren === 'yes',
+          hasOtherPets: form.hasOtherPets === 'yes',
+          otherPetsDetails: form.otherPetsDetails,
+          workSchedule: form.workSchedule,
+          experience: form.experience,
           reasonForAdoption: form.reason,
-          // Add more fields as needed
         }
       }, {
         headers: { Authorization: `Bearer ${token}` }
@@ -158,6 +167,105 @@ const AdoptionForm = () => {
                       onChange={handleChange}
                     />
                   </div>
+                </Form.Group>
+              </Col>
+            </Row>
+            
+            <h4 className="mb-3">Family Situation</h4>
+            <Row className="mb-4">
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Do you have children?</Form.Label>
+                  <div>
+                    <Form.Check
+                      inline
+                      type="radio"
+                      name="hasChildren"
+                      id="hasChildren-yes"
+                      label="Yes"
+                      value="yes"
+                      checked={form.hasChildren === 'yes'}
+                      onChange={handleChange}
+                    />
+                    <Form.Check
+                      inline
+                      type="radio"
+                      name="hasChildren"
+                      id="hasChildren-no"
+                      label="No"
+                      value="no"
+                      checked={form.hasChildren === 'no'}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Do you have other pets?</Form.Label>
+                  <div>
+                    <Form.Check
+                      inline
+                      type="radio"
+                      name="hasOtherPets"
+                      id="hasOtherPets-yes"
+                      label="Yes"
+                      value="yes"
+                      checked={form.hasOtherPets === 'yes'}
+                      onChange={handleChange}
+                    />
+                    <Form.Check
+                      inline
+                      type="radio"
+                      name="hasOtherPets"
+                      id="hasOtherPets-no"
+                      label="No"
+                      value="no"
+                      checked={form.hasOtherPets === 'no'}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </Form.Group>
+              </Col>
+            </Row>
+            
+            {form.hasOtherPets === 'yes' && (
+              <Form.Group className="mb-3">
+                <Form.Label>If yes, please describe your other pets</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="otherPetsDetails"
+                  value={form.otherPetsDetails}
+                  onChange={handleChange}
+                  required={form.hasOtherPets === 'yes'}
+                />
+              </Form.Group>
+            )}
+            
+            <h4 className="mb-3">Work Schedule</h4>
+            <Row className="mb-4">
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Work Schedule</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="workSchedule"
+                    value={form.workSchedule}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Pet Experience</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="experience"
+                    value={form.experience}
+                    onChange={handleChange}
+                    required
+                  />
                 </Form.Group>
               </Col>
             </Row>

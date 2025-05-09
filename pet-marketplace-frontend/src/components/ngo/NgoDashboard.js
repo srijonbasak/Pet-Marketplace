@@ -85,6 +85,14 @@ const NgoDashboard = () => {
             <FontAwesomeIcon icon={faPlus} />
             Add New Pet
           </Button>
+          <Button
+            variant="warning"
+            as={Link}
+            to="/ngo/pending-adoptions"
+            className="ms-2 d-flex align-items-center gap-2"
+          >
+            Pending Adoptions
+          </Button>
         </Col>
       </Row>
 

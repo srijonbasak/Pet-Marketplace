@@ -254,7 +254,7 @@ exports.getNgoPetStats = async (req, res) => {
     const totalPets = await Pet.countDocuments({ provider: ngoId });
     const availablePets = await Pet.countDocuments({ provider: ngoId, status: 'available' });
     const adoptedPets = await Pet.countDocuments({ provider: ngoId, status: 'adopted' });
-    const pendingAdoptions = await Pet.countDocuments({ provider: ngoId, status: 'pending' });
+    const pendingAdoptions = await Adoption.countDocuments({ provider: ngoId, status: 'pending' });
     res.json({ totalPets, availablePets, adoptedPets, pendingAdoptions });
   } catch (err) {
     console.error(err);

@@ -12,9 +12,10 @@ import {
   faUsers
 } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../hooks/useAuth';
+import axios from 'axios';
 
 const Dashboard = () => {
-  const { currentUser } = useAuth();
+  const { user } = useAuth();
   const [adoptions, setAdoptions] = useState([]);
   const [pets, setPets] = useState([]);
   const [products, setProducts] = useState([]);
@@ -22,95 +23,48 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchDashboardData = async () => {
+      setLoading(true);
       try {
-        // In a real app, these would be API calls
-        setTimeout(() => {
-          // Mock adoptions data
-          setAdoptions([
-            {
-              _id: 'adoption1',
-              petId: 'pet1',
-              petName: 'Max',
-              petImage: 'https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-              providerId: 'provider1',
-              providerName: 'Happy Paws Rescue',
-              status: 'pending',
-              date: '2023-08-15',
-              applicationDetails: {}
-            },
-            {
-              _id: 'adoption2',
-              petId: 'pet2',
-              petName: 'Luna',
-              petImage: 'https://images.unsplash.com/photo-1592194996308-7b43878e84a6?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-              providerId: 'provider2',
-              providerName: 'Pet Haven',
-              status: 'approved',
-              date: '2023-07-20',
-              applicationDetails: {}
-            }
-          ]);
+        const token = localStorage.getItem('token');
+        const adoptionRes = await axios.get('/api/adoptions', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setAdoptions(adoptionRes.data.adoptions || []);
 
-          // Show pets data for sellers and NGOs
-          if (['seller', 'ngo', 'admin'].includes(currentUser?.role)) {
-            setPets([
-              {
-                _id: 'pet3',
-                name: 'Rocky',
-                imageUrl: 'https://images.unsplash.com/photo-1589941013454-ec7d8b3b3f10?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-                status: 'available',
-                species: 'dog',
-                breed: 'German Shepherd',
-                createdAt: '2023-07-10',
-                adoptionFee: 180
-              },
-              {
-                _id: 'pet4',
-                name: 'Oliver',
-                imageUrl: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-                status: 'pending',
-                species: 'cat',
-                breed: 'Tabby',
-                createdAt: '2023-07-15',
-                adoptionFee: 90
-              }
-            ]);
+        if (['seller', 'ngo', 'admin'].includes(user?.role)) {
+          let petsUrl = '/api/pets';
+          if (user?.role !== 'admin') {
+            petsUrl += `?provider=${user._id}`;
           }
+          const petsRes = await axios.get(petsUrl, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setPets(petsRes.data.pets || []);
+        } else {
+          setPets([]);
+        }
 
-          // Show products data for sellers
-          if (['seller', 'admin'].includes(currentUser?.role)) {
-            setProducts([
-              {
-                _id: 'product1',
-                name: 'Premium Dog Food',
-                imageUrl: 'https://images.unsplash.com/photo-1589924691822-701767b1d837?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-                price: 29.99,
-                stock: 50,
-                category: 'Food',
-                createdAt: '2023-07-05'
-              },
-              {
-                _id: 'product2',
-                name: 'Cat Scratching Post',
-                imageUrl: 'https://images.unsplash.com/photo-1585071550721-fdb362ae2b8d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-                price: 39.99,
-                stock: 15,
-                category: 'Accessories',
-                createdAt: '2023-07-12'
-              }
-            ]);
+        if (['seller', 'admin'].includes(user?.role)) {
+          let productsUrl = '/api/products';
+          if (user?.role !== 'admin') {
+            productsUrl += `?shop=${user._id}`;
           }
-
-          setLoading(false);
-        }, 1000);
+          const productsRes = await axios.get(productsUrl, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setProducts(productsRes.data.products || []);
+        } else {
+          setProducts([]);
+        }
       } catch (err) {
-        console.error('Error fetching dashboard data:', err);
-        setLoading(false);
+        setAdoptions([]);
+        setPets([]);
+        setProducts([]);
       }
+      setLoading(false);
     };
-
     fetchDashboardData();
-  }, [currentUser]);
+  }, [user]);
 
   const renderStatusBadge = (status) => {
     let variant;
@@ -147,11 +101,11 @@ const Dashboard = () => {
         <Col>
           <h1>Dashboard</h1>
           <p className="text-muted">
-            Welcome back, {currentUser?.username}! 
-            {currentUser?.role === 'buyer' && ' Here you can track your adoption applications.'}
-            {currentUser?.role === 'seller' && ' Here you can manage your pets and products.'}
-            {currentUser?.role === 'ngo' && ' Here you can manage your pets and rescue operations.'}
-            {currentUser?.role === 'admin' && ' Here you can manage the platform.'}
+            Welcome back, {user?.username}! 
+            {user?.role === 'buyer' && ' Here you can track your adoption applications.'}
+            {user?.role === 'seller' && ' Here you can manage your pets and products.'}
+            {user?.role === 'ngo' && ' Here you can manage your pets and rescue operations.'}
+            {user?.role === 'admin' && ' Here you can manage the platform.'}
           </p>
         </Col>
       </Row>
@@ -188,19 +142,17 @@ const Dashboard = () => {
                       <tr key={adoption._id}>
                         <td>
                           <div className="d-flex align-items-center">
-                            <img 
-                              src={adoption.petImage} 
-                              alt={adoption.petName}
+                            <img
+                              src={adoption.pet?.images?.[0] || 'https://via.placeholder.com/40x40?text=No+Image'}
+                              alt={adoption.pet?.name}
                               style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '50%' }}
                               className="me-2"
                             />
-                            <Link to={`/pets/${adoption.petId}`}>
-                              {adoption.petName}
-                            </Link>
+                            <Link to={`/pets/${adoption.pet?._id}`}>{adoption.pet?.name}</Link>
                           </div>
                         </td>
-                        <td>{adoption.providerName}</td>
-                        <td>{new Date(adoption.date).toLocaleDateString()}</td>
+                        <td>{adoption.provider?.username}</td>
+                        <td>{adoption.applicationDate ? new Date(adoption.applicationDate).toLocaleDateString() : ''}</td>
                         <td>{renderStatusBadge(adoption.status)}</td>
                         <td>
                           <Link to={`/adoptions/${adoption._id}`} className="btn btn-sm btn-primary">
@@ -225,7 +177,7 @@ const Dashboard = () => {
       </Row>
 
       {/* My Pets Section (for sellers and NGOs) */}
-      {['seller', 'ngo', 'admin'].includes(currentUser?.role) && (
+      {['seller', 'ngo', 'admin'].includes(user?.role) && (
         <Row className="mb-4">
           <Col>
             <Card className="shadow-sm">
@@ -306,7 +258,7 @@ const Dashboard = () => {
       )}
 
       {/* My Products Section (for sellers) */}
-      {['seller', 'admin'].includes(currentUser?.role) && (
+      {['seller', 'admin'].includes(user?.role) && (
         <Row className="mb-4">
           <Col>
             <Card className="shadow-sm">
@@ -408,18 +360,18 @@ const Dashboard = () => {
                 </Col>
                 <Col sm={8}>
                   <p className="mb-2">
-                    <strong>Username:</strong> {currentUser?.username}
+                    <strong>Username:</strong> {user?.username}
                   </p>
                   <p className="mb-2">
-                    <strong>Email:</strong> {currentUser?.email}
+                    <strong>Email:</strong> {user?.email}
                   </p>
                   <p className="mb-2">
-                    <strong>Role:</strong> {currentUser?.role === 'buyer' ? 'Pet Adopter' : 
-                      currentUser?.role === 'seller' ? 'Pet Seller' :
-                      currentUser?.role === 'ngo' ? 'Rescue Organization' : 'Admin'}
+                    <strong>Role:</strong> {user?.role === 'buyer' ? 'Pet Adopter' : 
+                      user?.role === 'seller' ? 'Pet Seller' :
+                      user?.role === 'ngo' ? 'Rescue Organization' : 'Admin'}
                   </p>
                   <p className="mb-0">
-                    <strong>Member Since:</strong> {new Date(currentUser?.createdAt || Date.now()).toLocaleDateString()}
+                    <strong>Member Since:</strong> {new Date(user?.createdAt || Date.now()).toLocaleDateString()}
                   </p>
                 </Col>
               </Row>
@@ -454,7 +406,7 @@ const Dashboard = () => {
                     </Link>
                   </div>
                 </Col>
-                {currentUser?.role === 'buyer' && (
+                {user?.role === 'buyer' && (
                   <Col>
                     <div className="d-grid">
                       <Link to="/my-favorites" className="btn btn-outline-primary">
@@ -464,7 +416,7 @@ const Dashboard = () => {
                     </div>
                   </Col>
                 )}
-                {['seller', 'ngo'].includes(currentUser?.role) && (
+                {['seller', 'ngo'].includes(user?.role) && (
                   <Col>
                     <div className="d-grid">
                       <Link to="/my-applications" className="btn btn-outline-primary">
@@ -474,7 +426,7 @@ const Dashboard = () => {
                     </div>
                   </Col>
                 )}
-                {currentUser?.role === 'ngo' && (
+                {user?.role === 'ngo' && (
                   <Col>
                     <div className="d-grid">
                       <Link to="/rescues/new" className="btn btn-outline-primary">
@@ -484,7 +436,7 @@ const Dashboard = () => {
                     </div>
                   </Col>
                 )}
-                {currentUser?.role === 'admin' && (
+                {user?.role === 'admin' && (
                   <Col>
                     <div className="d-grid">
                       <Link to="/admin/users" className="btn btn-outline-primary">

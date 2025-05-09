@@ -41,6 +41,7 @@ import PrivateRoute from './components/common/PrivateRoute';
 import NgoDashboard from './components/ngo/NgoDashboard';
 import EmployeeDashboard from './components/employee/EmployeeDashboard';
 import AddPet from './components/ngo/AddPet';
+import PendingAdoptions from './components/ngo/PendingAdoptions';
 
 function App() {
   const { isLoading } = useAuth();
@@ -162,6 +163,14 @@ function App() {
             element={
               <PrivateRoute role="ngo">
                 <AddPet />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/ngo/pending-adoptions"
+            element={
+              <PrivateRoute role="ngo">
+                <PendingAdoptions />
               </PrivateRoute>
             }
           />
