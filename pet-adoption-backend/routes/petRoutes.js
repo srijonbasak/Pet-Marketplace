@@ -4,6 +4,10 @@ const { check } = require('express-validator');
 const petController = require('../controllers/petController');
 const { auth, isProvider } = require('../middleware/auth');
 
+// Add stats and recent pets endpoints for NGO dashboard
+router.get('/stats', auth, isProvider, petController.getNgoPetStats);
+router.get('/ngo/recent', auth, isProvider, petController.getNgoRecentPets);
+
 // @route   GET /api/pets
 // @desc    Get all pets with filters
 // @access  Public

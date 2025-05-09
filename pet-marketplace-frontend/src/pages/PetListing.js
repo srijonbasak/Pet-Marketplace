@@ -34,109 +34,23 @@ const PetListing = () => {
     const fetchPets = async () => {
       try {
         setLoading(true);
-        
-        // In a real application, you'd pass these filters to your API
-        // Here we'll just mock the data
-        
-        // Simulate API delay
-        setTimeout(() => {
-          const mockPets = [
-            {
-              _id: '1',
-              name: 'Max',
-              species: 'dog',
-              breed: 'Golden Retriever',
-              age: 2,
-              ageUnit: 'years',
-              gender: 'male',
-              size: 'large',
-              description: 'Friendly and playful Golden Retriever looking for a loving home.',
-              imageUrl: 'https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-              adoptionFee: 150,
-              vaccinated: true,
-              neutered: true
-            },
-            {
-              _id: '2',
-              name: 'Luna',
-              species: 'cat',
-              breed: 'Siamese',
-              age: 1,
-              ageUnit: 'years',
-              gender: 'female',
-              size: 'medium',
-              description: 'Playful Siamese cat that loves attention and cuddles.',
-              imageUrl: 'https://images.unsplash.com/photo-1592194996308-7b43878e84a6?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-              adoptionFee: 100,
-              vaccinated: true,
-              neutered: true
-            },
-            {
-              _id: '3',
-              name: 'Charlie',
-              species: 'dog',
-              breed: 'Beagle',
-              age: 1,
-              ageUnit: 'years',
-              gender: 'male',
-              size: 'medium',
-              description: 'Energetic Beagle puppy that loves to play fetch and go for walks.',
-              imageUrl: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-              adoptionFee: 120,
-              vaccinated: true,
-              neutered: false
-            },
-            {
-              _id: '4',
-              name: 'Daisy',
-              species: 'cat',
-              breed: 'Maine Coon',
-              age: 3,
-              ageUnit: 'years',
-              gender: 'female',
-              size: 'large',
-              description: 'Beautiful Maine Coon with a friendly personality. Good with children and other pets.',
-              imageUrl: 'https://images.unsplash.com/photo-1533743983669-94fa5c4338ec?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-              adoptionFee: 130,
-              vaccinated: true,
-              neutered: true
-            },
-            {
-              _id: '5',
-              name: 'Rocky',
-              species: 'dog',
-              breed: 'German Shepherd',
-              age: 2,
-              ageUnit: 'years',
-              gender: 'male',
-              size: 'large',
-              description: 'Intelligent German Shepherd with excellent training. Great for active families.',
-              imageUrl: 'https://images.unsplash.com/photo-1589941013454-ec7d8b3b3f10?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-              adoptionFee: 180,
-              vaccinated: true,
-              neutered: true
-            },
-            {
-              _id: '6',
-              name: 'Oliver',
-              species: 'cat',
-              breed: 'Tabby',
-              age: 1,
-              ageUnit: 'years',
-              gender: 'male',
-              size: 'medium',
-              description: 'Playful orange tabby who loves to cuddle and play with toys.',
-              imageUrl: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-              adoptionFee: 90,
-              vaccinated: true,
-              neutered: true
-            }
-          ];
-          
-          setPets(mockPets);
-          setTotalPages(3); // Mock total pages
-          setLoading(false);
-        }, 1000);
+
+        // Build query params from filters
+        const params = {
+          status: 'available',
+          page: currentPage,
+          limit: 9,
+        };
+        if (filters.species) params.species = filters.species;
+        if (filters.breed) params.breed = filters.breed;
+        if (filters.gender) params.gender = filters.gender;
+        if (filters.size) params.size = filters.size;
+        // Add more filters as needed
+
+        const res = await axios.get('/api/pets', { params });
+        setPets(res.data.pets);
+        setTotalPages(res.data.pagination.pages);
+        setLoading(false);
       } catch (err) {
         setError('Failed to fetch pets. Please try again later.');
         setLoading(false);
@@ -371,7 +285,7 @@ const PetListing = () => {
                     <Card className="h-100 shadow-sm pet-card">
                       <Card.Img 
                         variant="top" 
-                        src={pet.imageUrl} 
+                        src={pet.images && pet.images.length > 0 ? pet.images[0] : 'https://via.placeholder.com/300x200?text=No+Image'} 
                         alt={pet.name}
                         className="pet-card-img"
                       />

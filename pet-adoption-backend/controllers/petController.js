@@ -246,3 +246,32 @@ exports.removePetImage = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+// Get stats for the current NGO
+exports.getNgoPetStats = async (req, res) => {
+  try {
+    const ngoId = req.user.id;
+    const totalPets = await Pet.countDocuments({ provider: ngoId });
+    const availablePets = await Pet.countDocuments({ provider: ngoId, status: 'available' });
+    const adoptedPets = await Pet.countDocuments({ provider: ngoId, status: 'adopted' });
+    const pendingAdoptions = await Pet.countDocuments({ provider: ngoId, status: 'pending' });
+    res.json({ totalPets, availablePets, adoptedPets, pendingAdoptions });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Get recent pets for the current NGO
+exports.getNgoRecentPets = async (req, res) => {
+  try {
+    const ngoId = req.user.id;
+    const recentPets = await Pet.find({ provider: ngoId })
+      .sort({ createdAt: -1 })
+      .limit(5);
+    res.json(recentPets);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};

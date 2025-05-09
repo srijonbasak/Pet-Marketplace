@@ -30,100 +30,30 @@ const PetDetails = () => {
     const fetchPetDetails = async () => {
       try {
         setLoading(true);
-        
-        // For demo purposes, we'll use mock data
-        // In a real application, you would fetch from your API
-        setTimeout(() => {
-          // Mock pet data
-          const mockPet = {
-            _id: id,
-            name: 'Max',
-            species: 'dog',
-            breed: 'Golden Retriever',
-            age: 2,
-            ageUnit: 'years',
-            gender: 'male',
-            size: 'large',
-            color: 'Golden',
-            description: 'Max is a friendly and playful Golden Retriever looking for a loving home. He is great with children and other pets. He enjoys long walks, playing fetch, and cuddling on the couch. He is house-trained and knows basic commands. Max would thrive in an active family that can provide him with plenty of exercise and attention.',
-            providerId: 'provider123',
-            location: {
-              city: 'New York',
-              state: 'NY',
-              country: 'USA'
-            },
-            adoptionFee: 150,
+        const res = await axios.get(`/api/pets/${id}`);
+        setPet(res.data);
+
+        // Fetch provider/NGO info if needed
+        let providerId = res.data.provider;
+        if (providerId && typeof providerId === 'object') {
+          providerId = providerId._id;
+        }
+        if (providerId) {
+          const providerRes = await axios.get(`/api/users/${providerId}`);
+          setProvider(providerRes.data);
+        }
+
+        // Fetch similar pets (optional: you can filter by breed/species)
+        const similarRes = await axios.get('/api/pets', {
+          params: {
+            species: res.data.species,
+            breed: res.data.breed,
             status: 'available',
-            healthInfo: {
-              vaccinated: true,
-              neutered: true,
-              microchipped: true,
-              specialNeeds: false
-            },
-            activity: 'High',
-            goodWith: ['children', 'dogs', 'cats'],
-            images: [
-              'https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60',
-              'https://images.unsplash.com/photo-1561037404-61cd46aa615b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60',
-              'https://images.unsplash.com/photo-1596797882870-8c33deeac224?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60'
-            ],
-            createdAt: '2023-07-15'
-          };
-          
-          // Mock provider data
-          const mockProvider = {
-            _id: 'provider123',
-            name: 'Happy Paws Rescue',
-            type: 'ngo',
-            phone: '(123) 456-7890',
-            email: 'contact@happypawsrescue.org',
-            website: 'https://www.happypawsrescue.org',
-            rating: 4.8,
-            reviewCount: 42
-          };
-          
-          // Mock similar pets
-          const mockSimilarPets = [
-            {
-              _id: 'similar1',
-              name: 'Charlie',
-              species: 'dog',
-              breed: 'Golden Retriever',
-              age: 1,
-              ageUnit: 'years',
-              gender: 'male',
-              imageUrl: 'https://images.unsplash.com/photo-1522276498395-f4f68f7f8454?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=60',
-              adoptionFee: 120
-            },
-            {
-              _id: 'similar2',
-              name: 'Bella',
-              species: 'dog',
-              breed: 'Labrador Retriever',
-              age: 2,
-              ageUnit: 'years',
-              gender: 'female',
-              imageUrl: 'https://images.unsplash.com/photo-1605897472139-5857f0189repeated?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=60',
-              adoptionFee: 130
-            },
-            {
-              _id: 'similar3',
-              name: 'Cooper',
-              species: 'dog',
-              breed: 'Beagle',
-              age: 1,
-              ageUnit: 'years',
-              gender: 'male',
-              imageUrl: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=60',
-              adoptionFee: 100
-            }
-          ];
-          
-          setPet(mockPet);
-          setProvider(mockProvider);
-          setSimilarPets(mockSimilarPets);
-          setLoading(false);
-        }, 1000);
+            limit: 3
+          }
+        });
+        setSimilarPets(similarRes.data.pets.filter(p => p._id !== id));
+        setLoading(false);
       } catch (err) {
         setError('Failed to fetch pet details. Please try again later.');
         setLoading(false);
@@ -180,7 +110,7 @@ const PetDetails = () => {
       <Row>
         <Col lg={7} className="mb-4">
           <Carousel interval={null} className="shadow-sm rounded overflow-hidden">
-            {pet.images.map((image, index) => (
+            {pet.images?.map((image, index) => (
               <Carousel.Item key={index}>
                 <img
                   className="d-block w-100"
@@ -216,13 +146,13 @@ const PetDetails = () => {
                 <Badge bg={pet.status === 'available' ? 'success' : pet.status === 'pending' ? 'warning' : 'danger'} className="me-2">
                   {pet.status === 'available' ? 'Available' : pet.status === 'pending' ? 'Pending' : 'Adopted'}
                 </Badge>
-                {pet.healthInfo.vaccinated && (
+                {pet.vaccinated && (
                   <Badge bg="info" className="me-2">Vaccinated</Badge>
                 )}
-                {pet.healthInfo.neutered && (
+                {pet.neutered && (
                   <Badge bg="info" className="me-2">Neutered/Spayed</Badge>
                 )}
-                {pet.healthInfo.microchipped && (
+                {pet.microchipped && (
                   <Badge bg="info">Microchipped</Badge>
                 )}
               </div>
@@ -231,7 +161,11 @@ const PetDetails = () => {
                 <Col xs={6} className="mb-2">
                   <div className="d-flex align-items-center">
                     <FontAwesomeIcon icon={faMapMarkerAlt} className="text-primary me-2" />
-                    <span>{pet.location.city}, {pet.location.state}</span>
+                    <span>
+                      {pet.location?.city && pet.location?.state
+                        ? `${pet.location.city}, ${pet.location.state}`
+                        : 'Location not specified'}
+                    </span>
                   </div>
                 </Col>
                 <Col xs={6} className="mb-2">
@@ -259,7 +193,7 @@ const PetDetails = () => {
               <div className="mb-3">
                 <h5>Good with</h5>
                 <div>
-                  {pet.goodWith.map((item, index) => (
+                  {pet.goodWith?.map((item, index) => (
                     <Badge bg="light" text="dark" className="me-2 mb-2" key={index}>
                       {item.charAt(0).toUpperCase() + item.slice(1)}
                     </Badge>
@@ -298,19 +232,19 @@ const PetDetails = () => {
               <div className="d-flex align-items-center mb-3">
                 <FontAwesomeIcon icon={faUser} className="text-primary me-2" size="lg" />
                 <div>
-                  <h5 className="mb-0">{provider.name}</h5>
-                  <small className="text-muted">{provider.type === 'ngo' ? 'Rescue Organization' : 'Pet Seller'}</small>
+                  <h5 className="mb-0">{provider?.name}</h5>
+                  <small className="text-muted">{provider?.type === 'ngo' ? 'Rescue Organization' : 'Pet Seller'}</small>
                 </div>
               </div>
               
               <div className="mb-3">
                 <p className="mb-1">
-                  <strong>Email:</strong> {provider.email}
+                  <strong>Email:</strong> {provider?.email}
                 </p>
                 <p className="mb-1">
-                  <strong>Phone:</strong> {provider.phone}
+                  <strong>Phone:</strong> {provider?.phone}
                 </p>
-                {provider.website && (
+                {provider?.website && (
                   <p className="mb-0">
                     <strong>Website:</strong>{' '}
                     <a href={provider.website} target="_blank" rel="noopener noreferrer">
@@ -321,7 +255,7 @@ const PetDetails = () => {
               </div>
               
               <div className="d-grid">
-                <Link to={`/providers/${provider._id}`} className="btn btn-outline-primary">
+                <Link to={`/providers/${provider?._id}`} className="btn btn-outline-primary">
                   View Profile
                 </Link>
               </div>
@@ -372,16 +306,16 @@ const PetDetails = () => {
                           <strong>Activity Level:</strong> {pet.activity}
                         </li>
                         <li className="mb-2">
-                          <strong>Vaccinated:</strong> {pet.healthInfo.vaccinated ? 'Yes' : 'No'}
+                          <strong>Vaccinated:</strong> {pet.vaccinated ? 'Yes' : 'No'}
                         </li>
                         <li className="mb-2">
-                          <strong>Neutered/Spayed:</strong> {pet.healthInfo.neutered ? 'Yes' : 'No'}
+                          <strong>Neutered/Spayed:</strong> {pet.neutered ? 'Yes' : 'No'}
                         </li>
                         <li className="mb-2">
-                          <strong>Microchipped:</strong> {pet.healthInfo.microchipped ? 'Yes' : 'No'}
+                          <strong>Microchipped:</strong> {pet.microchipped ? 'Yes' : 'No'}
                         </li>
                         <li>
-                          <strong>Special Needs:</strong> {pet.healthInfo.specialNeeds ? 'Yes' : 'No'}
+                          <strong>Special Needs:</strong> {pet.specialNeeds ? 'Yes' : 'No'}
                         </li>
                       </ul>
                     </Col>
@@ -429,7 +363,7 @@ const PetDetails = () => {
                 <Card className="h-100 shadow-sm pet-card">
                   <Card.Img 
                     variant="top" 
-                    src={similarPet.imageUrl} 
+                    src={similarPet.images && similarPet.images.length > 0 ? similarPet.images[0] : 'https://via.placeholder.com/300x200?text=No+Image'} 
                     alt={similarPet.name}
                     className="pet-card-img"
                   />

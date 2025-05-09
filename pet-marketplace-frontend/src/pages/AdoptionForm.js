@@ -3,29 +3,68 @@ import { Container, Form, Button, Card, Alert, Row, Col } from 'react-bootstrap'
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaw, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
 
 const AdoptionForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [petInfo, setPetInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState({
+    fullName: '',
+    phone: '',
+    housingType: '',
+    hasYard: '',
+    reason: ''
+  });
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    // Simulate loading pet data
-    setTimeout(() => {
-      setPetInfo({
-        name: 'Sample Pet',
-        breed: 'Sample Breed',
-        adoptionFee: 100
-      });
+    const fetchPet = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(`/api/pets/${id}`);
+        setPetInfo({
+          name: res.data.name,
+          breed: res.data.breed,
+          adoptionFee: res.data.adoptionFee
+        });
+      } catch (err) {
+        setPetInfo(null);
+      }
       setLoading(false);
-    }, 1000);
+    };
+    fetchPet();
   }, [id]);
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert('Adoption form submitted! This is a placeholder function.');
-    navigate('/my-adoptions');
+    setError('');
+    setSuccess('');
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post('/api/adoptions', {
+        petId: id,
+        applicationDetails: {
+          livingArrangement: form.housingType,
+          hasYard: form.hasYard === 'yes',
+          reasonForAdoption: form.reason,
+          // Add more fields as needed
+        }
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSuccess('Adoption application submitted!');
+      setTimeout(() => navigate('/my-adoptions'), 1500);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to submit application');
+    }
   };
 
   if (loading) {
@@ -55,10 +94,13 @@ const AdoptionForm = () => {
         <Card.Body>
           <Alert variant="info" className="mb-4">
             <p className="mb-0">
-              You're applying to adopt <strong>{petInfo.name}</strong> ({petInfo.breed}).
-              The adoption fee is <strong>${petInfo.adoptionFee}</strong>.
+              You're applying to adopt <strong>{petInfo?.name}</strong> ({petInfo?.breed}).
+              The adoption fee is <strong>${petInfo?.adoptionFee}</strong>.
             </p>
           </Alert>
+          
+          {error && <Alert variant="danger">{error}</Alert>}
+          {success && <Alert variant="success">{success}</Alert>}
           
           <Form onSubmit={handleSubmit}>
             <h4 className="mb-3">Personal Information</h4>
@@ -66,13 +108,13 @@ const AdoptionForm = () => {
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Full Name</Form.Label>
-                  <Form.Control type="text" placeholder="Enter your full name" required />
+                  <Form.Control type="text" placeholder="Enter your full name" name="fullName" value={form.fullName} onChange={handleChange} required />
                 </Form.Group>
               </Col>
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Phone Number</Form.Label>
-                  <Form.Control type="tel" placeholder="Enter your phone number" required />
+                  <Form.Control type="tel" placeholder="Enter your phone number" name="phone" value={form.phone} onChange={handleChange} required />
                 </Form.Group>
               </Col>
             </Row>
@@ -82,7 +124,7 @@ const AdoptionForm = () => {
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Housing Type</Form.Label>
-                  <Form.Select required>
+                  <Form.Select name="housingType" value={form.housingType} onChange={handleChange} required>
                     <option value="">Select your housing type</option>
                     <option value="house">House</option>
                     <option value="apartment">Apartment</option>
@@ -102,6 +144,8 @@ const AdoptionForm = () => {
                       id="hasYard-yes"
                       label="Yes"
                       value="yes"
+                      checked={form.hasYard === 'yes'}
+                      onChange={handleChange}
                     />
                     <Form.Check
                       inline
@@ -110,6 +154,8 @@ const AdoptionForm = () => {
                       id="hasYard-no"
                       label="No"
                       value="no"
+                      checked={form.hasYard === 'no'}
+                      onChange={handleChange}
                     />
                   </div>
                 </Form.Group>
@@ -122,6 +168,9 @@ const AdoptionForm = () => {
                 as="textarea"
                 rows={3}
                 placeholder="Tell us why you'd like to adopt this pet and what kind of home you can provide."
+                name="reason"
+                value={form.reason}
+                onChange={handleChange}
                 required
               />
             </Form.Group>
