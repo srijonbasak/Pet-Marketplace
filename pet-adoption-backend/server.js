@@ -8,7 +8,7 @@ const path = require('path');
 dotenv.config();
 
 // Hardcoded JWT secret (alternative to .env)
-process.env.JWT_SECRET = 'petshopSecretToken';
+// process.env.JWT_SECRET = 'petshopSecretToken';
 
 // Initialize Express app
 const app = express();
@@ -38,6 +38,9 @@ app.use('/api/rescues', require('./routes/rescueRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/shops', require('./routes/shopRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
+app.use('/api/employees', require('./routes/employeeRoutes'));
+app.use('/api/invoices', require('./routes/invoiceRoutes'));
+app.use('/api/inventory', require('./routes/inventoryRoutes'));
 
 // Static folder for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

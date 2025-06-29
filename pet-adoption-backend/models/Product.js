@@ -15,6 +15,10 @@ const productSchema = new mongoose.Schema({
     required: true,
     enum: ['food', 'toys', 'accessories', 'medicine', 'grooming', 'other']
   },
+  buyPrice: {
+    type: Number,
+    required: true
+  },
   price: {
     type: Number,
     required: true

@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Table, Alert, Badge } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { inventoryAPI } from '../../services/api';
 
 const SellerDashboard = () => {
   const [sellerData, setSellerData] = useState(null);
   const [shop, setShop] = useState(null);
   const [products, setProducts] = useState([]);
   const [pets, setPets] = useState([]);
+  const [pendingAdjustments, setPendingAdjustments] = useState([]);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -34,6 +36,16 @@ const SellerDashboard = () => {
         try {
           const shopRes = await axios.get('/api/shops/my-shop', config);
           setShop(shopRes.data);
+          
+          // If shop exists, fetch pending inventory adjustments
+          if (shopRes.data) {
+            try {
+              const adjustmentsRes = await inventoryAPI.getPendingAdjustments();
+              setPendingAdjustments(adjustmentsRes.data || []);
+            } catch (adjustmentErr) {
+              console.error('Error fetching pending adjustments:', adjustmentErr);
+            }
+          }
         } catch (err) {
           if (err.response?.status !== 404) {
             setError('Error fetching shop data');
@@ -72,6 +84,10 @@ const SellerDashboard = () => {
 
   const handleEditShop = () => {
     navigate('/seller/edit-shop');
+  };
+  
+  const handleViewShopDashboard = () => {
+    navigate('/seller/shop-dashboard');
   };
 
   if (!sellerData) {
@@ -125,35 +141,44 @@ const SellerDashboard = () => {
                         <strong>Contact:</strong> {shop.contactInfo.phone} | {shop.contactInfo.email}
                       </p>
                     </Col>
-                    <Col md={4} className="text-end">
-                      <Button variant="primary" onClick={handleEditShop} className="me-2">
+                    <Col md={4} className="text-md-end">
+                      <Button variant="outline-primary" onClick={handleEditShop} className="mb-2 me-2">
                         <i className="fas fa-edit me-2"></i>
                         Edit Shop
                       </Button>
-                      <Button variant="secondary" onClick={() => navigate('/seller/shop-dashboard')} className="me-2">
-                        <i className="fas fa-store me-2"></i>
+                      <Button variant="primary" onClick={handleViewShopDashboard}>
+                        <i className="fas fa-tachometer-alt me-2"></i>
                         Shop Dashboard
                       </Button>
-                      <Button
-                        variant="outline-primary"
-                        onClick={() => window.open(`/shop/${shop.name.replace(/\s+/g, '-').toLowerCase()}`, '_blank')}
-                      >
-                        <i className="fas fa-external-link-alt me-2"></i>
-                        View Shop Page
-                      </Button>
+                      
+                      {/* Pending Approvals Alert */}
+                      {pendingAdjustments.length > 0 && (
+                        <div className="mt-3 p-3 border border-warning rounded bg-light">
+                          <div className="d-flex justify-content-between align-items-center">
+                            <div>
+                              <h5 className="mb-0">
+                                <i className="fas fa-exclamation-triangle text-warning me-2"></i>
+                                Pending Approvals
+                              </h5>
+                              <p className="mb-0 mt-1">
+                                {pendingAdjustments.length} inventory adjustment{pendingAdjustments.length !== 1 ? 's' : ''} pending your approval
+                              </p>
+                            </div>
+                            <Button 
+                              variant="warning" 
+                              size="sm" 
+                              onClick={() => navigate('/seller/shop-dashboard')}
+                            >
+                              Review Now
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </Col>
                   </Row>
                 </>
               ) : (
-                <div className="text-center py-5">
-                  <i className="fas fa-store fa-3x mb-3 text-muted"></i>
-                  <h4>No Shop Created Yet</h4>
-                  <p className="text-muted mb-4">Create your shop to start selling products and pets</p>
-                  <Button variant="success" size="lg" onClick={handleCreateShop}>
-                    <i className="fas fa-plus me-2"></i>
-                    Create Your Shop
-                  </Button>
-                </div>
+                <p>You haven't created a shop yet. Create one to start selling products!</p>
               )}
             </Card.Body>
           </Card>

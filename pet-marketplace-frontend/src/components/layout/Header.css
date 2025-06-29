@@ -1,0 +1,16 @@
+.navbar.sticky-top {
+  box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+.cart-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
+  font-size: 0.7em;
+  padding: 0.3em 0.5em;
+}
+
+.nav-link-custom {
+  margin: 0 0.5rem;
+} 

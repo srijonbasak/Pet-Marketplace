@@ -1,0 +1,55 @@
+/* Home.css */
+
+.hero-section {
+  background: var(--bs-primary);
+  /* A subtle gradient can also look nice */
+  /* background: linear-gradient(to right, #3891A6, #56b3b0); */
+  background-size: cover;
+  background-position: center;
+  border-radius: 0.5rem;
+  overflow: hidden; /* Ensures pets don't go outside the hero area */
+}
+
+.service-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background-color: #f8f9fa;
+  border-radius: 50%;
+  transition: all 0.3s ease-in-out;
+}
+
+.service-icon-wrapper:hover {
+  background-color: var(--bs-primary);
+  color: white;
+}
+
+.service-icon-wrapper:hover .text-primary {
+  color: white !important;
+}
+
+.pet-card .card-img-top,
+.product-card-img {
+  height: 250px;
+  object-fit: cover;
+}
+
+.card-footer {
+  background-color: white;
+  border-top: none;
+}
+
+.full-width-section {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+.cta-section {
+  background: linear-gradient(to right, var(--bs-primary), #56b3b0);
+}

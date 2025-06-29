@@ -1,0 +1,32 @@
+.interactive-pet-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+  cursor: none; /* Hide the default cursor */
+}
+
+.pet-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.interactive-pet {
+  position: absolute;
+  width: 150px;
+  height: auto;
+  filter: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.4));
+  opacity: 0.9;
+  will-change: transform;
+  /* Adjust transform-origin to make the pounce more natural */
+  transform-origin: center 80%; 
+}
+
+.interactive-pet img {
+  width: 100%;
+  height: auto;
+} 

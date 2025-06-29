@@ -92,17 +92,9 @@ exports.loginUser = async (req, res) => {
     const userResponse = {
       _id: user._id,
       username: user.username,
-      firstName: user.firstName,
-      lastName: user.lastName,
       email: user.email,
       role: user.role,
-      phone: user.phone,
-      address: user.address,
-      bio: user.bio,
-      ngoDetails: user.ngoDetails,
-      petPreferences: user.petPreferences,
-      favorites: user.favorites,
-      createdAt: user.createdAt
+      profileImage: user.profileImage ? true : false,
     };
 
     // Sign token

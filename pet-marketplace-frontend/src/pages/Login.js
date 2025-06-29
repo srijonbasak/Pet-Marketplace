@@ -38,6 +38,8 @@ const Login = () => {
             navigate('/ngo/dashboard', { replace: true });
             break;
           case 'employee':
+            // For employees, direct them to the employee dashboard which shows shop features
+            console.log('Employee login detected, redirecting to employee dashboard');
             navigate('/employee/dashboard', { replace: true });
             break;
           default:
@@ -110,6 +112,9 @@ const Login = () => {
                   Don't have an account?{' '}
                   <Link to="/register" className="text-decoration-none">Register</Link>
                 </p>
+                <small className="text-muted mt-3 d-block">
+                  Employees: Use the email and password provided by your shop manager
+                </small>
               </div>
             </Card.Body>
           </Card>

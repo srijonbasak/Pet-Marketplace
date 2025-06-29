@@ -6,6 +6,7 @@ import { userAPI } from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import authService from '../services/auth';
+import { processProfileImage } from '../utils/imageUtils';
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
@@ -86,90 +87,13 @@ const UserProfile = () => {
         setFormData(userData);
         
         // Process profile image if available
-        if (userData.profileImage && userData.profileImage.preview) {
-          console.log('Using preview image data directly from response');
-          setImagePreview(userData.profileImage.preview);
-        }
-        else if (userData.profileImage && userData.profileImage.data) {
-          console.log('Processing profile image data:', {
-            dataType: typeof userData.profileImage.data,
-            isBuffer: userData.profileImage.data instanceof Buffer,
-            isString: typeof userData.profileImage.data === 'string',
-            contentType: userData.profileImage.contentType,
-            dataLength: typeof userData.profileImage.data === 'string' ? userData.profileImage.data.length : 'unknown'
-          });
-          
-          try {
-            // Check if the data is already a string (like a base64 string or URL)
-            if (typeof userData.profileImage.data === 'string') {
-              // If it's already a data URL, use it directly
-              if (userData.profileImage.data.startsWith('data:')) {
-                console.log('Profile image is already a data URL');
-                setImagePreview(userData.profileImage.data);
-              } else {
-                try {
-                  // Check if it's a JSON representation of binary data
-                  const isDataObject = userData.profileImage.data.includes('{') && 
-                                      userData.profileImage.data.includes('}');
-                  
-                  if (isDataObject) {
-                    // Try to parse as JSON if it looks like an object
-                    console.log('Profile image data appears to be a JSON string representation of binary');
-                    const dataObj = JSON.parse(userData.profileImage.data);
-                    const binData = Object.values(dataObj);
-                    const uint8Array = new Uint8Array(binData);
-                    const base64 = arrayBufferToBase64(uint8Array);
-                    const contentType = userData.profileImage.contentType || 'image/jpeg';
-                    setImagePreview(`data:${contentType};base64,${base64}`);
-                  } else {
-                    // Assume it's already a base64 string without the data URL prefix
-                    console.log('Profile image is a string, assuming base64 without prefix');
-                    const contentType = userData.profileImage.contentType || 'image/jpeg';
-                    setImagePreview(`data:${contentType};base64,${userData.profileImage.data}`);
-                  }
-                } catch (parseErr) {
-                  console.error('Error parsing profile image data string:', parseErr);
-                  // Assume it's base64 encoded anyway
-                  const contentType = userData.profileImage.contentType || 'image/jpeg';
-                  setImagePreview(`data:${contentType};base64,${userData.profileImage.data}`);
-                }
-              }
-            } else if (userData.profileImage.data && typeof userData.profileImage.data === 'object') {
-              // Handle Buffer, ArrayBuffer, or Buffer-like object
-              console.log('Converting binary profile image data to base64');
-              
-              // If it looks like a buffer representation with type and data properties
-              if (userData.profileImage.data.type && userData.profileImage.data.data) {
-                console.log('Found nested buffer data structure');
-                const base64String = arrayBufferToBase64(userData.profileImage.data.data);
-                const contentType = userData.profileImage.contentType || 'image/jpeg';
-                setImagePreview(`data:${contentType};base64,${base64String}`);
-              } else {
-                // Regular buffer object or array
-                const base64String = arrayBufferToBase64(userData.profileImage.data);
-                if (base64String) {
-                  const contentType = userData.profileImage.contentType || 'image/jpeg';
-                  setImagePreview(`data:${contentType};base64,${base64String}`);
-                  console.log('Successfully set image preview from binary data');
-                } else {
-                  console.warn('Failed to convert profile image to base64');
-                }
-              }
-            }
-          } catch (imgErr) {
-            console.error('Error processing profile image:', imgErr);
-          }
-        } else if (userData.profileImage && userData.profileImage.url) {
-          // If the server provides a direct URL to the image
-          console.log('Using profile image URL from server');
-          setImagePreview(userData.profileImage.url);
+        const imageUrl = processProfileImage(userData.profileImage);
+        if (imageUrl) {
+          setImagePreview(imageUrl);
         } else {
-          console.log('No profile image available');
-          
-          // Check if we have a cached image in session storage
+          // Check for cached image as a fallback
           const cachedImage = sessionStorage.getItem('lastImagePreview');
           if (cachedImage) {
-            console.log('Using cached profile image from session storage');
             setImagePreview(cachedImage);
           }
         }
@@ -227,164 +151,15 @@ const UserProfile = () => {
     fetchUserProfile();
   }, [isAuthenticated, navigate, logout]);
 
-  // Update the existing useEffect that processes image data
   useEffect(() => {
     if (!user) return;
     
-    console.log('User data changed, checking for profile image');
-    
-    try {
-      // If user data has already been processed, skip processing
-      if (user.profileImage && user.profileImage._alreadyProcessed) {
-        console.log('Image already processed, skipping image processing');
-        return;
-      }
-      
-      // If we already have a valid image preview from a file selection, keep it
-      if (imagePreview && imagePreview.startsWith('data:image/')) {
-        console.log('Already have valid image preview, keeping it');
-        return;
-      }
-      
-      // Process profile image if it exists
-      if (user.profileImage && user.profileImage.data) {
-        console.log('Found profile image data in user object');
-        
-        // For already processed data URLs
-        if (typeof user.profileImage.data === 'string' && 
-            user.profileImage.data.startsWith('data:')) {
-          console.log('Using pre-processed data URL');
-          setImagePreview(user.profileImage.data);
-          return;
-        }
-        
-        // For binary data (Buffer, ArrayBuffer, etc.)
-        console.log('Processing binary image data, type:', typeof user.profileImage.data);
-        console.log('Is array?', Array.isArray(user.profileImage.data));
-        
-        try {
-          const base64String = arrayBufferToBase64(user.profileImage.data);
-          const contentType = user.profileImage.contentType || 'image/jpeg';
-          console.log('Created base64 string, length:', base64String ? base64String.length : 0);
-          
-          if (base64String) {
-            const dataUrl = `data:${contentType};base64,${base64String}`;
-            console.log('Setting image preview with data URL');
-            setImagePreview(dataUrl);
-          } else {
-            console.warn('Could not create base64 string from image data');
-          }
-        } catch (imgErr) {
-          console.error('Error processing image data:', imgErr);
-        }
-      } else {
-        console.log('No profile image data found in user object');
-      }
-    } catch (err) {
-      console.error('Error in image processing effect:', err);
+    // This effect can be simplified or removed if the main effect handles all cases
+    const imageUrl = processProfileImage(user.profileImage);
+    if (imageUrl && imageUrl !== imagePreview) {
+      setImagePreview(imageUrl);
     }
-  }, [user]);
-
-  // New useEffect to ensure we keep the local image preview if it exists
-  useEffect(() => {
-    // This effect ensures we don't lose the image preview when navigation happens
-    return () => {
-      // This cleanup function will run when the component unmounts
-      // We can use it to save the image preview in sessionStorage if needed
-      if (imagePreview) {
-        console.log('Saving image preview to session storage');
-        sessionStorage.setItem('lastImagePreview', imagePreview);
-      }
-    };
-  }, [imagePreview]);
-
-  // Another useEffect to restore the image preview from session storage on mount
-  useEffect(() => {
-    const savedPreview = sessionStorage.getItem('lastImagePreview');
-    if (savedPreview) {
-      console.log('Restoring image preview from session storage');
-      setImagePreview(savedPreview);
-      
-      // If we're restoring from session storage, we need to also restore the file
-      // This handles the case where a user refreshes after selecting but before uploading
-      try {
-        if (savedPreview.startsWith('data:image/')) {
-          // Convert the data URL back to a file
-          const dataURLParts = savedPreview.split(',');
-          const mime = dataURLParts[0].match(/:(.*?);/)[1];
-          const byteString = atob(dataURLParts[1]);
-          const arrayBuffer = new ArrayBuffer(byteString.length);
-          const intArray = new Uint8Array(arrayBuffer);
-          
-          for (let i = 0; i < byteString.length; i++) {
-            intArray[i] = byteString.charCodeAt(i);
-          }
-          
-          const blob = new Blob([arrayBuffer], { type: mime });
-          const fileName = 'restored_profile_image.' + mime.split('/')[1];
-          const file = new File([blob], fileName, { type: mime });
-          
-          // Create a new DataTransfer object
-          if (fileInputRef.current) {
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            fileInputRef.current.files = dataTransfer.files;
-            console.log('Restored file to input element');
-          }
-        }
-      } catch (err) {
-        console.error('Error restoring file from data URL:', err);
-      }
-    }
-  }, []);
-
-  // Convert array buffer to base64 - improved version
-  const arrayBufferToBase64 = (buffer) => {
-    // Handle null/undefined
-    if (!buffer) {
-      console.warn('Received null/undefined buffer');
-      return '';
-    }
-    
-    console.log('Converting buffer to base64, type:', typeof buffer);
-    
-    // If we have a plain object representing a buffer (from JSON)
-    if (typeof buffer === 'object' && !ArrayBuffer.isView(buffer) && !Array.isArray(buffer)) {
-      try {
-        // Try to convert object to Uint8Array
-        console.log('Converting object buffer to Uint8Array');
-        const values = Object.values(buffer);
-        buffer = new Uint8Array(values);
-      } catch (e) {
-        console.error('Error converting object to Uint8Array:', e);
-        return '';
-      }
-    }
-    
-    let binary = '';
-    let bytes;
-    
-    // Handle different buffer types
-    if (buffer instanceof ArrayBuffer) {
-      bytes = new Uint8Array(buffer);
-    } else if (ArrayBuffer.isView(buffer)) {
-      bytes = new Uint8Array(buffer.buffer);
-    } else if (Array.isArray(buffer)) {
-      bytes = new Uint8Array(buffer);
-    } else {
-      console.error('Unsupported buffer type:', typeof buffer);
-      return '';
-    }
-    
-    // Convert Uint8Array to binary string
-    const len = bytes.byteLength;
-    for (let i = 0; i < len; i++) {
-      binary += String.fromCharCode(bytes[i]);
-    }
-    
-    // Convert binary string to base64
-    return window.btoa(binary);
-  };
+  }, [user, imagePreview]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -460,101 +235,40 @@ const UserProfile = () => {
   };
 
   const handleImageUpload = async () => {
-    if (!fileInputRef.current || !fileInputRef.current.files || fileInputRef.current.files.length === 0) {
-      setError('Please select an image first');
+    if (!fileInputRef.current || !fileInputRef.current.files[0]) {
+      setError('Please select an image file first.');
       return;
     }
-    
+
+    const file = fileInputRef.current.files[0];
+    setLoading(true);
+    setError(null);
+    setUploadProgress(0);
+
     try {
-      setUploadProgress(10);
-      
-      // Get the file from the hidden input
-      const file = fileInputRef.current.files[0];
-      console.log('Uploading file:', file.name, 'type:', file.type, 'size:', file.size);
-      
-      // Validate the file is an image and not too large
-      if (!file.type.startsWith('image/')) {
-        throw new Error('Selected file is not an image. Please select an image file.');
+      const response = await userAPI.uploadProfileImage(file, (progress) => {
+        setUploadProgress(progress);
+      });
+
+      // Assuming the backend returns the updated user with the new image URL/data
+      const updatedUser = response.data.user;
+      setUser(updatedUser);
+
+      const imageUrl = processProfileImage(updatedUser.profileImage);
+      if (imageUrl) {
+        setImagePreview(imageUrl);
+        sessionStorage.setItem('lastImagePreview', imageUrl);
       }
       
-      if (file.size > 5 * 1024 * 1024) {
-        throw new Error('Image is too large. Maximum size is 5MB.');
-      }
+      setSaveSuccess('Profile image uploaded successfully!');
+      setTimeout(() => setSaveSuccess(false), 3000);
       
-      // Clear any existing errors
-      setError(null);
-      
-      try {
-        // Use the API service directly with the progress callback
-        const response = await userAPI.uploadProfileImage(file, (progress) => {
-          console.log(`Upload progress: ${progress}%`);
-          setUploadProgress(progress);
-        });
-        
-        console.log('Upload successful, response received:', response.data);
-        
-        // Check if the response includes a preview image
-        if (response.data.user && response.data.user.profileImage) {
-          if (response.data.user.profileImage.preview) {
-            console.log('Using preview image from server response');
-            setImagePreview(response.data.user.profileImage.preview);
-            sessionStorage.setItem('lastImagePreview', response.data.user.profileImage.preview);
-          } else if (typeof response.data.user.profileImage.data === 'string') {
-            // If the server returns data as a base64 string
-            console.log('Using image data from server response');
-            const contentType = response.data.user.profileImage.contentType || 'image/jpeg';
-            const imageUrl = `data:${contentType};base64,${response.data.user.profileImage.data}`;
-            setImagePreview(imageUrl);
-            sessionStorage.setItem('lastImagePreview', imageUrl);
-          }
-          // We already have a preview, so we just keep it
-          else {
-            console.log('No preview in response, keeping existing preview');
-            if (imagePreview) {
-              sessionStorage.setItem('lastImagePreview', imagePreview);
-            }
-          }
-        } else {
-          console.log('No image data in response, keeping existing preview');
-          if (imagePreview) {
-            sessionStorage.setItem('lastImagePreview', imagePreview);
-          }
-        }
-        
-        // Update the user state with the returned user data
-        if (response.data.user) {
-          setUser(response.data.user);
-        }
-        
-        // Ensure the progress bar completes
-        setUploadProgress(100);
-        setTimeout(() => setUploadProgress(0), 1500);
-        
-        // Show success message
-        setSaveSuccess(true);
-        setTimeout(() => setSaveSuccess(false), 3000);
-      } catch (uploadErr) {
-        console.error('Upload request failed:', uploadErr);
-        
-        // Handle specific error types
-        if (uploadErr.response) {
-          // The server responded with an error status
-          const errorMessage = uploadErr.response.data?.message || 
-                               `Server error: ${uploadErr.response.status} ${uploadErr.response.statusText}`;
-          throw new Error(errorMessage);
-        } else if (uploadErr.request) {
-          // The request was made but no response was received
-          throw new Error('No response from server. Please check your internet connection and try again.');
-        } else {
-          // Something else caused the error
-          throw new Error(`Upload error: ${uploadErr.message}`);
-        }
-      }
     } catch (err) {
-      console.error('Error uploading image:', err);
+      console.error('Image upload error:', err);
+      setError('Failed to upload image. Please try again.');
+    } finally {
+      setLoading(false);
       setUploadProgress(0);
-      setError(`Image upload failed: ${err.message}`);
-      setTimeout(() => setError(null), 5000); // Clear error after 5 seconds
     }
   };
 

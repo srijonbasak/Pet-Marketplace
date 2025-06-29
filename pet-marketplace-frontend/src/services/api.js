@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with default config
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api', // Point to backend server
+  baseURL: '/api', // Point to backend server (use relative path so proxy works)
   headers: {
     'Content-Type': 'application/json'
   }
@@ -29,32 +29,68 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   response => response,
   error => {
-    // Handle token expiration or auth errors
-    if (error.response && error.response.status === 401) {
-      console.log('401 error from:', error.config.url);
+    if (error.response) {
+      console.log(`API Error: ${error.response.status} from: ${error.config.url}`);
+      console.log('Response data:', error.response.data);
       
-      // Only redirect to login for specific endpoints that require authentication
-      // Don't redirect for profile update or image upload endpoints
-      const nonRedirectPaths = ['/users/me', '/users/profile-image'];
-      const requestPath = error.config.url;
-      
-      let shouldRedirect = true;
-      for (const path of nonRedirectPaths) {
-        if (requestPath.includes(path)) {
-          shouldRedirect = false;
-          break;
+      // Handle token expiration or auth errors
+      if (error.response.status === 401) {
+        console.log('401 error from:', error.config.url);
+        
+        // Only redirect to login for specific endpoints that require authentication
+        // Don't redirect for profile update or image upload endpoints
+        const nonRedirectPaths = ['/users/me', '/users/profile-image'];
+        const requestPath = error.config.url;
+        
+        let shouldRedirect = true;
+        for (const path of nonRedirectPaths) {
+          if (requestPath.includes(path)) {
+            shouldRedirect = false;
+            break;
+          }
+        }
+        
+        if (shouldRedirect) {
+          console.log('Redirecting to login due to auth error');
+          localStorage.removeItem('token');
+          window.location.href = '/login';
         }
       }
-      
-      if (shouldRedirect) {
-        console.log('Redirecting to login due to auth error');
-        localStorage.removeItem('token');
-        window.location.href = '/login';
-      }
+    } else {
+      console.log('Network or other error:', error.message);
     }
     return Promise.reject(error);
   }
 );
+
+// Shop API calls
+export const shopAPI = {
+  getMyShop: () => api.get('/shops/my-shop'),
+  getShopById: (shopId) => api.get(`/shops/${shopId}`),
+  createShop: (shopData) => api.post('/shops', shopData),
+  updateShop: (shopId, shopData) => api.put(`/shops/${shopId}`, shopData),
+};
+
+// Invoice API calls
+export const invoiceAPI = {
+  // For employees
+  createInvoice: (invoiceData) => api.post('/invoices', invoiceData),
+  getShopInvoices: () => api.get('/invoices/shop'),
+  
+  // For sellers
+  getSellerShopInvoices: () => api.get('/invoices/seller/shop'),
+  
+  // Common
+  getInvoiceById: (invoiceId) => api.get(`/invoices/${invoiceId}`),
+};
+
+// Employee API calls
+export const employeeAPI = {
+  getShopEmployees: (shopId) => api.get(`/employees/shop/${shopId}`),
+  registerEmployee: (employeeData) => api.post('/employees/register', employeeData),
+  updateEmployeeStatus: (employeeId, isActive) => api.put(`/employees/${employeeId}/status`, { isActive }),
+  updateEmployeePermissions: (employeeId, permissions) => api.put(`/employees/${employeeId}/permissions`, { permissions }),
+};
 
 // Auth API calls
 export const authAPI = {
@@ -126,6 +162,18 @@ export const productAPI = {
   createProduct: productData => api.post('/products', productData),
   updateProduct: (productId, productData) => api.put(`/products/${productId}`, productData),
   deleteProduct: productId => api.delete(`/products/${productId}`)
+};
+
+// Inventory API calls
+export const inventoryAPI = {
+  // For both employees and sellers
+  getAdjustments: (params) => api.get('/inventory/adjustments', { params }),
+  // For employees
+  createAdjustment: (adjustmentData) => api.post('/inventory/adjustments', adjustmentData),
+  updateProductStock: (productId, stockData) => api.put(`/inventory/products/${productId}/stock`, stockData),
+  // For sellers
+  getPendingAdjustments: () => api.get('/inventory/adjustments/pending'),
+  updateAdjustmentStatus: (adjustmentId, statusData) => api.put(`/inventory/adjustments/${adjustmentId}/status`, statusData)
 };
 
 // Rescue API calls

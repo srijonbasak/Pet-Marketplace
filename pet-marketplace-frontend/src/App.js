@@ -33,6 +33,7 @@ import SellerRegister from './components/auth/SellerRegister';
 import SellerDashboard from './components/seller/SellerDashboard';
 import ShopForm from './components/seller/ShopForm';
 import AddProduct from './components/seller/AddProduct';
+import EditProduct from './components/seller/EditProduct';
 import ShopDashboard from './components/seller/ShopDashboard';
 
 // Protected route component
@@ -43,6 +44,12 @@ import NgoDashboard from './components/ngo/NgoDashboard';
 import EmployeeDashboard from './components/employee/EmployeeDashboard';
 import AddPet from './components/ngo/AddPet';
 import PendingAdoptions from './components/ngo/PendingAdoptions';
+
+// Import the EmployeeManagement component
+import EmployeeManagement from './components/shop/EmployeeManagement';
+import CreateInvoice from './pages/CreateInvoice';
+import EmployeeAddProduct from './pages/EmployeeAddProduct';
+import UpdateInventory from './pages/UpdateInventory';
 
 function App() {
   const { isLoading } = useAuth();
@@ -60,7 +67,7 @@ function App() {
   return (
     <>
       <Header />
-      <main className="container py-4" style={{ minHeight: 'calc(100vh - 160px)' }}>
+      <main className="py-4" style={{ minHeight: 'calc(100vh - 160px)' }}>
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<Home />} />
@@ -143,6 +150,14 @@ function App() {
             }
           />
           <Route
+            path="/seller/edit-product/:id"
+            element={
+              <PrivateRoute role="seller">
+                <EditProduct />
+              </PrivateRoute>
+            }
+          />
+          <Route
             path="/seller/shop-dashboard"
             element={
               <PrivateRoute role="seller">
@@ -186,9 +201,41 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/employee/create-invoice"
+            element={
+              <PrivateRoute role="employee">
+                <CreateInvoice />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/employee/add-product"
+            element={
+              <PrivateRoute role="employee">
+                <EmployeeAddProduct />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/employee/update-inventory/:productId"
+            element={
+              <PrivateRoute role="employee">
+                <UpdateInventory />
+              </PrivateRoute>
+            }
+          />
           
           {/* Shop routes */}
           <Route path="/shop/:shopname" element={<ShopPage />} />
+          <Route
+            path="/shop/employees"
+            element={
+              <PrivateRoute role="seller">
+                <EmployeeManagement />
+              </PrivateRoute>
+            }
+          />
           
           {/* 404 route */}
           <Route path="*" element={<NotFound />} />

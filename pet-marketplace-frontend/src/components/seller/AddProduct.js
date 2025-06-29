@@ -8,6 +8,7 @@ const AddProduct = () => {
     name: '',
     description: '',
     category: 'food',
+    buyPrice: '',
     price: '',
     stock: '',
     image: ''
@@ -103,16 +104,44 @@ const AddProduct = () => {
                     <option value="other">Other</option>
                   </Form.Select>
                 </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Price</Form.Label>
-                  <Form.Control
-                    type="number"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
+                
+                <Row>
+                  <Col md={6}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Purchase Price ($)</Form.Label>
+                      <Form.Control
+                        type="number"
+                        name="buyPrice"
+                        value={formData.buyPrice}
+                        onChange={handleChange}
+                        step="0.01"
+                        min="0.01"
+                        required
+                      />
+                      <Form.Text className="text-muted">
+                        What you paid to acquire this product
+                      </Form.Text>
+                    </Form.Group>
+                  </Col>
+                  <Col md={6}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Selling Price ($)</Form.Label>
+                      <Form.Control
+                        type="number"
+                        name="price"
+                        value={formData.price}
+                        onChange={handleChange}
+                        step="0.01"
+                        min="0.01"
+                        required
+                      />
+                      <Form.Text className="text-muted">
+                        What customers will pay for this product
+                      </Form.Text>
+                    </Form.Group>
+                  </Col>
+                </Row>
+                
                 <Form.Group className="mb-3">
                   <Form.Label>Stock</Form.Label>
                   <Form.Control
@@ -120,6 +149,7 @@ const AddProduct = () => {
                     name="stock"
                     value={formData.stock}
                     onChange={handleChange}
+                    min="1"
                     required
                   />
                 </Form.Group>
