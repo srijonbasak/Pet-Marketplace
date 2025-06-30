@@ -19,7 +19,7 @@ const UserProfile = () => {
   const fileInputRef = useRef(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   
-  const { user: authUser, isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth(); // authUser unused
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -204,35 +204,35 @@ const UserProfile = () => {
     });
   };
 
-  const handleImageSelect = (e) => {
-    console.log('File input change event triggered');
-    const file = e.target.files?.[0];
-    
-    if (!file) {
-      console.warn('No file selected');
-      return;
-    }
-    
-    console.log('File selected:', file.name, 'type:', file.type, 'size:', file.size);
-    
-    // Create a FileReader to read the file
-    const reader = new FileReader();
-    
-    // Handle errors
-    reader.onerror = () => {
-      console.error('FileReader error');
-      setError('Error reading the selected file. Please try another file.');
-    };
-    
-    // Set up completion handler
-    reader.onload = () => {
-      console.log('File read completed');
-      setImagePreview(reader.result);
-    };
-    
-    // Read the file as a data URL (base64 encoded)
-    reader.readAsDataURL(file);
-  };
+  // const handleImageSelect = (e) => {
+  //   console.log('File input change event triggered');
+  //   const file = e.target.files?.[0];
+  //   
+  //   if (!file) {
+  //     console.warn('No file selected');
+  //     return;
+  //   }
+  //   
+  //   console.log('File selected:', file.name, 'type:', file.type, 'size:', file.size);
+  //   
+  //   // Create a FileReader to read the file
+  //   const reader = new FileReader();
+  //   
+  //   // Handle errors
+  //   reader.onerror = () => {
+  //     console.error('FileReader error');
+  //     setError('Error reading the selected file. Please try another file.');
+  //   };
+  //   
+  //   // Set up completion handler
+  //   reader.onload = () => {
+  //     console.log('File read completed');
+  //     setImagePreview(reader.result);
+  //   };
+  //   
+  //   // Read the file as a data URL (base64 encoded)
+  //   reader.readAsDataURL(file);
+  // }; // Unused
 
   const handleImageUpload = async () => {
     if (!fileInputRef.current || !fileInputRef.current.files[0]) {

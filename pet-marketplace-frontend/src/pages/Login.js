@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Button, Card, Alert } from 'react-bootstrap';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
@@ -13,7 +13,7 @@ const Login = () => {
   
   const { login } = useAuth();
   const navigate = useNavigate();
-  // const location = useLocation();
+  // const location = useLocation(); // Unused
 
   const handleSubmit = async (e) => {
     e.preventDefault();

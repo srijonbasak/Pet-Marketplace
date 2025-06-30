@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Button, Card } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPaw, faShoppingCart, faHandHoldingHeart, faSearch, faTag, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faPaw, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import { motion } from 'framer-motion';
 import { petAPI } from '../services/api';
-import AnimatedCard from '../components/common/AnimatedCard';
-import SkeletonCard from '../components/common/SkeletonCard';
-import InteractivePetBackground from '../components/common/InteractivePetBackground';
+// import AnimatedCard from '../components/common/AnimatedCard';
+// import SkeletonCard from '../components/common/SkeletonCard';
+// import InteractivePetBackground from '../components/common/InteractivePetBackground';
 import FeaturedPetsCarousel from '../components/common/FeaturedPetsCarousel';
 import './Home.css';
 
@@ -20,7 +20,7 @@ import RescueLottie from '../components/common/RescueLottie';
 const Home = () => {
   const [featuredPets, setFeaturedPets] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // const [error, setError] = useState(null); // Unused
 
   useEffect(() => {
     const fetchFeaturedItems = async () => {
@@ -28,10 +28,10 @@ const Home = () => {
         setLoading(true);
         const petsRes = await petAPI.getAllPets({ limit: 3, status: 'available' });
         setFeaturedPets(petsRes.data.pets || []);
-        setError(null);
+        // setError(null); // Unused
       } catch (err) {
         console.error('Error fetching featured items:', err);
-        setError('Could not load featured pets. Please try again later.');
+        // setError('Could not load featured pets. Please try again later.'); // Unused
       } finally {
         setLoading(false);
       }
