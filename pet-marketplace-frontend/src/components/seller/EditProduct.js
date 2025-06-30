@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Card, Container, Row, Col, Alert, Spinner } from 'react-bootstrap';
-import axios from 'axios';
+import { default as api } from '../../services/api';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -43,7 +43,7 @@ const EditProduct = () => {
         };
         
         // Get product details
-        const productRes = await axios.get(`/api/products/${id}`, config);
+        const productRes = await api.get(`/api/products/${id}`, config);
         const product = productRes.data;
         // setOriginalProduct(product); // Unused, kept for ESLint
         
@@ -59,7 +59,7 @@ const EditProduct = () => {
         });
         
         // Get seller's shop
-        const shopRes = await axios.get('/api/shops/my-shop', config);
+        const shopRes = await api.get('/api/shops/my-shop', config);
         // setShopId(shopRes.data._id); // Unused, kept for ESLint
         
         // Verify product belongs to seller's shop
@@ -104,7 +104,7 @@ const EditProduct = () => {
       };
       
       // Update the product
-      const response = await axios.put(`/api/products/${id}`, payload, config);
+      const response = await api.put(`/api/products/${id}`, payload, config);
       console.log('Product updated:', response.data);
       
       setSuccess('Product updated successfully!');

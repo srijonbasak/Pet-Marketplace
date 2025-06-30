@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHandHoldingHeart, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 
 import { useAuth } from '../hooks/useAuth';
 import RescueLottie from '../components/common/RescueLottie';
@@ -21,7 +21,7 @@ const RescueOperations = () => {
       setLoading(true);
       setError('');
       try {
-        const res = await axios.get('/api/rescues');
+        const res = await api.get('/rescues');
         setRescues(res.data.rescues || res.data || []);
       } catch (err) {
         setError('Failed to load rescues.');

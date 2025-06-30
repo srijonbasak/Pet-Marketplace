@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Table, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { default as api } from '../../services/api';
 import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -32,8 +32,8 @@ const NgoDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       const [statsRes, petsRes] = await Promise.all([
-        axios.get('/api/pets/stats', { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get('/api/pets/ngo/recent', { headers: { Authorization: `Bearer ${token}` } })
+        api.get('/api/pets/stats', { headers: { Authorization: `Bearer ${token}` } }),
+        api.get('/api/pets/ngo/recent', { headers: { Authorization: `Bearer ${token}` } })
       ]);
 
       setStats(statsRes.data);
@@ -49,7 +49,7 @@ const NgoDashboard = () => {
   const handleDeletePet = async (petId) => {
     if (window.confirm('Are you sure you want to delete this pet?')) {
       try {
-        await axios.delete(`/api/pets/${petId}`);
+        await api.delete(`/api/pets/${petId}`);
         toast.success('Pet deleted successfully');
         fetchDashboardData();
       } catch (err) {

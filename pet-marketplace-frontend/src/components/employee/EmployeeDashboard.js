@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Alert, ListGroup, Button, Table, Tab, Tabs, Badge } from 'react-bootstrap'; // Spinner removed
 // import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { default as api } from '../../services/api';
 // import { invoiceAPI } from '../../services/api'; // Unused
 
 const EmployeeDashboard = () => {
@@ -35,18 +35,18 @@ const EmployeeDashboard = () => {
         };
         
         // Get employee profile
-        const employeeRes = await axios.get('/api/employees/me', config);
+        const employeeRes = await api.get('/api/employees/me', config);
         console.log('Employee data:', employeeRes.data);
         setEmployeeData(employeeRes.data);
         
         // Get shop info using the shop ID from employee data
-        const shopRes = await axios.get(`/api/shops/${employeeRes.data.shop}`, config);
+        const shopRes = await api.get(`/api/shops/${employeeRes.data.shop}`, config);
         console.log('Shop data:', shopRes.data);
         setShopData(shopRes.data);
         
         // Fetch products for this shop
         if (employeeRes.data.permissions.canAddProducts || employeeRes.data.permissions.canManageInventory) {
-          const productsRes = await axios.get(`/api/products?shop=${employeeRes.data.shop}`, config);
+          const productsRes = await api.get(`/api/products?shop=${employeeRes.data.shop}`, config);
           setProducts(Array.isArray(productsRes.data) ? productsRes.data.filter(p => p !== null) : []);
         }
         
@@ -54,7 +54,7 @@ const EmployeeDashboard = () => {
         if (employeeRes.data.permissions.canCreateInvoices) {
           try {
             console.log('Fetching invoices for shop...');
-            const invoicesRes = await axios.get('/api/invoices/shop', config);
+            const invoicesRes = await api.get('/api/invoices/shop', config);
             console.log('Invoices response:', invoicesRes.data);
             
             if (Array.isArray(invoicesRes.data)) {
@@ -95,7 +95,7 @@ const EmployeeDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.put(`/api/invoices/${invoiceId}/status`, { paymentStatus: newStatus }, config);
+      await api.put(`/api/invoices/${invoiceId}/status`, { paymentStatus: newStatus }, config);
       
       // Update the invoice status in the local state
       setInvoices(invoices => invoices.map(invoice => 

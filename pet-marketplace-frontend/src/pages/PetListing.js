@@ -6,7 +6,7 @@ import './PetListing.css';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter, faSearch } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios';
+import api from '../services/api';
 
 const PetListing = () => {
   // State for pets data
@@ -50,7 +50,7 @@ const PetListing = () => {
         if (filters.size) params.size = filters.size;
         // Add more filters as needed
 
-        const res = await axios.get('/api/pets', { params });
+        const res = await api.get('/pets', { params });
         setPets(res.data.pets);
         setTotalPages(res.data.pagination.pages);
         setLoading(false);

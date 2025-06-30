@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import { default as api } from '../services/api';
 import { toast } from 'react-toastify';
 import { userAPI } from '../services/api';
 import { CartProvider } from './CartContext';
@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
               Authorization: `Bearer ${token}`
             }
           };
-          const res = await axios.get('/api/users/me', config);
+          const res = await api.get('/api/users/me', config);
           setUser(res.data);
           setIsAuthenticated(true);
           console.log('AuthContext: User authenticated', res.data.role);
@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }) => {
     try {
       // First try regular user login
       try {
-        const res = await axios.post('/api/users/login', { email, password });
+        const res = await api.post('/api/users/login', { email, password });
         const token = res.data.token;
         
         // Store token in localStorage
@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }) => {
         console.log('User login failed, trying employee login', userError.response?.status);
         
         // If user login fails, try employee login
-        const employeeRes = await axios.post('/api/employees/login', { email, password });
+        const employeeRes = await api.post('/api/employees/login', { email, password });
         const token = employeeRes.data.token;
         
         // Store token in localStorage
@@ -96,7 +96,7 @@ export const AuthProvider = ({ children }) => {
             }
           };
           
-          const employeeDataRes = await axios.get('/api/employees/me', config);
+          const employeeDataRes = await api.get('/api/employees/me', config);
           console.log('Complete employee data:', employeeDataRes.data);
           
           // Merge the employee data with the tokenData
@@ -125,7 +125,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const res = await axios.post('/api/users/register', userData);
+      const res = await api.post('/api/users/register', userData);
       const token = res.data.token;
       
       // Store token in localStorage

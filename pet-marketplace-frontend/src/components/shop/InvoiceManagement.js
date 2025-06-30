@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Form, Table, Modal } from 'react-bootstrap';
 import { toast } from 'react-toastify';
-import axios from 'axios';
+import { default as api } from '../../services/api';
 
 const InvoiceManagement = () => {
   const [invoices, setInvoices] = useState([]);
@@ -35,7 +35,7 @@ const InvoiceManagement = () => {
 
   const fetchInvoices = async () => {
     try {
-      const response = await axios.get('/api/invoices/shop');
+      const response = await api.get('/api/invoices/shop');
       setInvoices(response.data);
     } catch (error) {
       toast.error('Failed to fetch invoices');

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Button, Table, Alert, Spinner } from 'react-bootstrap';
-import axios from 'axios';
+import { default as api } from '../../services/api';
 
 const PendingAdoptions = () => {
   const [adoptions, setAdoptions] = useState([]);
@@ -18,7 +18,7 @@ const PendingAdoptions = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('/api/adoptions?status=pending', {
+      const res = await api.get('/api/adoptions?status=pending', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setAdoptions(res.data.adoptions || []);
@@ -33,7 +33,7 @@ const PendingAdoptions = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`/api/adoptions/${adoptionId}/status`, { status }, {
+      await api.put(`/api/adoptions/${adoptionId}/status`, { status }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setActionMsg(`Adoption request ${status === 'approved' ? 'approved' : 'rejected'} successfully.`);

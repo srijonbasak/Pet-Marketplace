@@ -3,7 +3,7 @@ import { Container, Form, Button, Card, Alert, Row, Col } from 'react-bootstrap'
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaw, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios';
+import api from '../services/api';
 
 const AdoptionForm = () => {
   const { id } = useParams();
@@ -29,7 +29,7 @@ const AdoptionForm = () => {
     const fetchPet = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`/api/pets/${id}`);
+        const res = await api.get(`/pets/${id}`);
         setPetInfo({
           name: res.data.name,
           breed: res.data.breed,
@@ -54,7 +54,7 @@ const AdoptionForm = () => {
     setSuccess('');
     try {
       const token = localStorage.getItem('token');
-      await axios.post('/api/adoptions', {
+      await api.post('/api/adoptions', {
         petId: id,
         applicationDetails: {
           livingArrangement: form.housingType,

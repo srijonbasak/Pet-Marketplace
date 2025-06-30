@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Container, Table, Button, Alert, Form } from 'react-bootstrap';
 import { useCart } from '../context/CartContext';
-import axios from 'axios';
+import { default as api } from '../services/api';
 
 const Cart = () => {
   const { cart, removeFromCart, updateQuantity, clearCart } = useCart();
@@ -25,7 +25,7 @@ const Cart = () => {
         paymentMethod,
         total: cart.total
       };
-      await axios.post('/api/orders', orderData, config);
+      await api.post('/api/orders', orderData, config);
       setOrderPlaced(true);
       clearCart();
     } catch (err) {

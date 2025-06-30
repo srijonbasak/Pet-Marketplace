@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Container, Row, Col, Card, Spinner, Alert, Image, Button } from 'react-bootstrap';
-import axios from 'axios';
+import { default as api } from '../services/api';
 
 const ShopPage = () => {
   const { shopname } = useParams();
@@ -14,7 +14,7 @@ const ShopPage = () => {
   useEffect(() => {
     const fetchShop = async () => {
       try {
-        const shopRes = await axios.get(`/api/shops/by-name/${shopname}`);
+        const shopRes = await api.get(`/api/shops/by-name/${shopname}`);
         setShop(shopRes.data.shop);
         setProducts(shopRes.data.products || []);
       } catch (err) {

@@ -14,7 +14,7 @@ import {
 
 import { useAuth } from '../hooks/useAuth';
 import HeroLottie from '../components/common/HeroLottie';
-import axios from 'axios';
+import { default as api } from '../services/api';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -28,7 +28,7 @@ const Dashboard = () => {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const adoptionRes = await axios.get('/api/adoptions', {
+        const adoptionRes = await api.get('/api/adoptions', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setAdoptions(adoptionRes.data.adoptions || []);
@@ -38,7 +38,7 @@ const Dashboard = () => {
           if (user?.role !== 'admin') {
             petsUrl += `?provider=${user._id}`;
           }
-          const petsRes = await axios.get(petsUrl, {
+          const petsRes = await api.get(petsUrl, {
             headers: { Authorization: `Bearer ${token}` }
           });
           setPets(petsRes.data.pets || []);
@@ -51,7 +51,7 @@ const Dashboard = () => {
           if (user?.role !== 'admin') {
             productsUrl += `?shop=${user._id}`;
           }
-          const productsRes = await axios.get(productsUrl, {
+          const productsRes = await api.get(productsUrl, {
             headers: { Authorization: `Bearer ${token}` }
           });
           setProducts(productsRes.data.products || []);

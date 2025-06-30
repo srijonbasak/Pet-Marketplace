@@ -4,7 +4,7 @@ import { Container, Row, Col, Card, Button, Carousel, Badge, Tabs, Tab, Alert } 
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faPaw, faMapMarkerAlt, faCalendarAlt, faVenusMars, faRulerVertical, faUser } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios';
+import api from '../services/api';
 import { useAuth } from '../hooks/useAuth';
 import { motion } from 'framer-motion';
 import PetAdoptionLottie from '../components/common/PetAdoptionLottie';
@@ -26,7 +26,7 @@ const PetDetails = () => {
     const fetchPetDetails = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`/api/pets/${id}`);
+        const res = await api.get(`/pets/${id}`);
         setPet(res.data);
 
         // Fetch provider/NGO info if needed
@@ -35,12 +35,12 @@ const PetDetails = () => {
           providerId = providerId._id;
         }
         if (providerId) {
-          const providerRes = await axios.get(`/api/users/${providerId}`);
+          const providerRes = await api.get(`/users/${providerId}`);
           setProvider(providerRes.data);
         }
 
         // Fetch similar pets (optional: you can filter by breed/species)
-        const similarRes = await axios.get('/api/pets', {
+        const similarRes = await api.get('/pets', {
           params: {
             species: res.data.species,
             breed: res.data.breed,
