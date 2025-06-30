@@ -3,8 +3,8 @@ services:
     name: pet-adoption-backend
     env: node
     plan: free
-    buildCommand: npm install && npm run build || true
-    startCommand: node server.js
+    buildCommand: npm install
+    startCommand: npm run dev
     envVars:
       - key: NODE_VERSION
         value: 18.20.2
