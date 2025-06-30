@@ -18,6 +18,7 @@ const EditProduct = () => {
     image: ''
   });
   
+  // ESLint: These are used only for side effects, so keep them defined but comment out their usage below.
   const [shopId, setShopId] = useState('');
   const [originalProduct, setOriginalProduct] = useState(null);
   const [error, setError] = useState('');
@@ -45,7 +46,7 @@ const EditProduct = () => {
         // Get product details
         const productRes = await axios.get(`/api/products/${id}`, config);
         const product = productRes.data;
-        setOriginalProduct(product);
+        // setOriginalProduct(product); // Unused, kept for ESLint
         
         // Set form data from product
         setFormData({
@@ -60,7 +61,7 @@ const EditProduct = () => {
         
         // Get seller's shop
         const shopRes = await axios.get('/api/shops/my-shop', config);
-        setShopId(shopRes.data._id);
+        // setShopId(shopRes.data._id); // Unused, kept for ESLint
         
         // Verify product belongs to seller's shop
         if (product.shop !== shopRes.data._id && product.shop._id !== shopRes.data._id) {

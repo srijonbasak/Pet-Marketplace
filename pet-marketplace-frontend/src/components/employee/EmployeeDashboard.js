@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Alert, ListGroup, Button, Table, Tab, Tabs, Badge } from 'react-bootstrap'; // Spinner removed
-import { useAuth } from '../../context/AuthContext';
+// import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 // import { invoiceAPI } from '../../services/api'; // Unused

@@ -6,8 +6,8 @@ import { shopAPI, employeeAPI } from '../../services/api';
 const EmployeeManagement = () => {
   const [employees, setEmployees] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  // const [showEditModal, setShowEditModal] = useState(false);
+  // const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [shopId, setShopId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
@@ -64,7 +64,7 @@ const EmployeeManagement = () => {
   };
 
   const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, checked } = e.target;
     if (name.startsWith('permissions.')) {
       const permission = name.split('.')[1];
       setFormData(prev => ({

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Table, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+// import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { invoiceAPI, productAPI } from '../services/api';
+// import { invoiceAPI, productAPI } from '../services/api';
 
 const CreateInvoice = () => {
   const [products, setProducts] = useState([]);
@@ -26,7 +26,7 @@ const CreateInvoice = () => {
   });
   
   const navigate = useNavigate();
-  const { user } = useAuth();
+  // const { user } = useAuth();
 
   useEffect(() => {
     const fetchShopAndProducts = async () => {
@@ -143,7 +143,7 @@ const CreateInvoice = () => {
     console.log(`Input change: ${name} = ${value}`);
     
     if (name.startsWith('items.')) {
-      const [_, field] = name.split('.');
+  const [, field] = name.split('.');
       const newItems = [...formData.items];
       
       if (field === 'product') {

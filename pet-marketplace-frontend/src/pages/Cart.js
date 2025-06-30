@@ -25,7 +25,7 @@ const Cart = () => {
         paymentMethod,
         total: cart.total
       };
-      const res = await axios.post('/api/orders', orderData, config);
+      await axios.post('/api/orders', orderData, config);
       setOrderPlaced(true);
       clearCart();
     } catch (err) {
