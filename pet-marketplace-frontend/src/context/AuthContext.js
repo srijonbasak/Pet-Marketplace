@@ -125,13 +125,20 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const res = await api.post('/api/users/register', userData);
+      // Ensure required fields for backend: username, email, password, role
+      const payload = {
+        username: userData.username || userData.email.split('@')[0],
+        email: userData.email,
+        password: userData.password,
+        role: userData.role || 'buyer',
+        firstName: userData.firstName || '',
+        lastName: userData.lastName || ''
+      };
+      const res = await api.post('/api/users/register', payload);
       const token = res.data.token;
-      
       // Store token in localStorage
       localStorage.setItem('token', token);
       console.log('AuthContext: Registration successful, token stored');
-      
       setUser(res.data.user);
       setIsAuthenticated(true);
       toast.success('Registration successful!');
