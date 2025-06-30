@@ -43,7 +43,7 @@ const PendingAdoptions = () => {
       setLoading(false);
     }
   };
-
+// ...existing code...
   return (
     <Container className="py-4">
       <h2 className="mb-4">Pending Adoption Requests</h2>
@@ -112,7 +112,7 @@ const PendingAdoptions = () => {
         </Table>
       )}
     </Container>
-  );
+  ); // No unused _ variable
 };
 
 export default PendingAdoptions; 

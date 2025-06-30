@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Alert, ListGroup, Button, Table, Spinner, Tab, Tabs, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Card, Alert, ListGroup, Button, Table, Tab, Tabs, Badge } from 'react-bootstrap'; // Spinner removed
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { invoiceAPI } from '../../services/api';
+// import { invoiceAPI } from '../../services/api'; // Unused
 
 const EmployeeDashboard = () => {
   const [employeeData, setEmployeeData] = useState(null);
@@ -12,7 +12,7 @@ const EmployeeDashboard = () => {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { user } = useAuth();
+  // const { user } = useAuth(); // Unused
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -80,9 +80,7 @@ const EmployeeDashboard = () => {
     fetchEmployeeData();
   }, []);
 
-  const handleAddProduct = () => {
-    navigate('/employee/add-product');
-  };
+  // const handleAddProduct = () => { /* ... */ }; // Unused
 
   const handleEditProduct = (id) => {
     navigate(`/employee/edit-product/${id}`);
