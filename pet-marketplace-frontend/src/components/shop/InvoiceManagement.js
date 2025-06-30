@@ -35,7 +35,7 @@ const InvoiceManagement = () => {
 
   const fetchInvoices = async () => {
     try {
-      const response = await api.get('/api/invoices/shop');
+      const response = await api.get('/invoices/shop');
       setInvoices(response.data);
     } catch (error) {
       toast.error('Failed to fetch invoices');

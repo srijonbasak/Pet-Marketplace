@@ -54,7 +54,7 @@ const AdoptionForm = () => {
     setSuccess('');
     try {
       const token = localStorage.getItem('token');
-      await api.post('/api/adoptions', {
+      await api.post('/adoptions', {
         petId: id,
         applicationDetails: {
           livingArrangement: form.housingType,

@@ -44,7 +44,7 @@ const UpdateInventory = () => {
         };
         
         // Get employee data to verify permissions
-        const employeeRes = await api.get('/api/employees/me', config);
+        const employeeRes = await api.get('/employees/me', config);
         console.log('Employee data:', employeeRes.data);
         
         if (!employeeRes.data.permissions?.canManageInventory) {
@@ -56,12 +56,12 @@ const UpdateInventory = () => {
         setEmployeeData(employeeRes.data);
         
         // Get product details
-        const productRes = await api.get(`/api/products/${productId}`, config);
+        const productRes = await api.get(`/products/${productId}`, config);
         console.log('Product data:', productRes.data);
         setProduct(productRes.data);
         
         // Get shop data
-        const shopRes = await api.get(`/api/shops/${employeeRes.data.shop}`, config);
+        const shopRes = await api.get(`/shops/${employeeRes.data.shop}`, config);
         console.log('Shop data:', shopRes.data);
         setShopData(shopRes.data);
         
@@ -159,7 +159,7 @@ const UpdateInventory = () => {
       console.log('Submitting inventory adjustment:', adjustmentData);
       
       // Create inventory adjustment record
-      const adjustmentRes = await api.post('/api/inventory/adjustments', adjustmentData, config);
+      const adjustmentRes = await api.post('/inventory/adjustments', adjustmentData, config);
       console.log('Adjustment created:', adjustmentRes.data);
       
       // If there are no damaged or expired items, update the product stock directly
@@ -169,7 +169,7 @@ const UpdateInventory = () => {
           stock: calculateNewStock()
         };
         
-        const updateRes = await api.put(`/api/products/${productId}/stock`, updateData, config);
+        const updateRes = await api.put(`/products/${productId}/stock`, updateData, config);
         console.log('Product stock updated:', updateRes.data);
         
         toast.success('Inventory updated successfully');

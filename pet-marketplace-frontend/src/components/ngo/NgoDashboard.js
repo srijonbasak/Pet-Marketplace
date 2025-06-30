@@ -32,8 +32,8 @@ const NgoDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       const [statsRes, petsRes] = await Promise.all([
-        api.get('/api/pets/stats', { headers: { Authorization: `Bearer ${token}` } }),
-        api.get('/api/pets/ngo/recent', { headers: { Authorization: `Bearer ${token}` } })
+        api.get('/pets/stats', { headers: { Authorization: `Bearer ${token}` } }),
+        api.get('/pets/ngo/recent', { headers: { Authorization: `Bearer ${token}` } })
       ]);
 
       setStats(statsRes.data);
@@ -49,7 +49,7 @@ const NgoDashboard = () => {
   const handleDeletePet = async (petId) => {
     if (window.confirm('Are you sure you want to delete this pet?')) {
       try {
-        await api.delete(`/api/pets/${petId}`);
+        await api.delete(`/pets/${petId}`);
         toast.success('Pet deleted successfully');
         fetchDashboardData();
       } catch (err) {

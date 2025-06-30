@@ -43,7 +43,7 @@ const EditProduct = () => {
         };
         
         // Get product details
-        const productRes = await api.get(`/api/products/${id}`, config);
+        const productRes = await api.get(`/products/${id}`, config);
         const product = productRes.data;
         // setOriginalProduct(product); // Unused, kept for ESLint
         
@@ -59,7 +59,7 @@ const EditProduct = () => {
         });
         
         // Get seller's shop
-        const shopRes = await api.get('/api/shops/my-shop', config);
+        const shopRes = await api.get('/shops/my-shop', config);
         // setShopId(shopRes.data._id); // Unused, kept for ESLint
         
         // Verify product belongs to seller's shop

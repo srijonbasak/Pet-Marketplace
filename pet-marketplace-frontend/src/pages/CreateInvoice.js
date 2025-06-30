@@ -42,7 +42,7 @@ const CreateInvoice = () => {
         }
         
         // Get employee data to get shop ID
-        const employeeRes = await api.get('/api/employees/me', {
+        const employeeRes = await api.get('/employees/me', {
           headers: { Authorization: `Bearer ${token}` }
         });
         console.log('Employee data:', employeeRes.data);
@@ -57,7 +57,7 @@ const CreateInvoice = () => {
         const shopId = employeeRes.data.shop;
         
         // Get shop data
-        const shopRes = await api.get(`/api/shops/${shopId}`, {
+        const shopRes = await api.get(`/shops/${shopId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         console.log('Shop data:', shopRes.data);
@@ -66,7 +66,7 @@ const CreateInvoice = () => {
         // Get products for the shop using direct axios call to ensure proper response handling
         console.log(`Fetching products for shop ID: ${shopId}`);
         try {
-          const productsRes = await api.get(`/api/products`, {
+          const productsRes = await api.get(`/products`, {
             params: { shop: shopId },
             headers: { Authorization: `Bearer ${token}` }
           });
@@ -264,7 +264,7 @@ const CreateInvoice = () => {
       }
       
       // Try direct axios call instead of using the service
-      const response = await api.post('/api/invoices', formData, {
+      const response = await api.post('/invoices', formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

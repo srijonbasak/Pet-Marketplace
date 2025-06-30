@@ -28,13 +28,13 @@ const Dashboard = () => {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const adoptionRes = await api.get('/api/adoptions', {
+        const adoptionRes = await api.get('/adoptions', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setAdoptions(adoptionRes.data.adoptions || []);
 
         if (['seller', 'ngo', 'admin'].includes(user?.role)) {
-          let petsUrl = '/api/pets';
+          let petsUrl = '/pets';
           if (user?.role !== 'admin') {
             petsUrl += `?provider=${user._id}`;
           }
@@ -47,7 +47,7 @@ const Dashboard = () => {
         }
 
         if (['seller', 'admin'].includes(user?.role)) {
-          let productsUrl = '/api/products';
+          let productsUrl = '/products';
           if (user?.role !== 'admin') {
             productsUrl += `?shop=${user._id}`;
           }

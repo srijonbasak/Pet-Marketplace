@@ -39,7 +39,7 @@ const EmployeeAddProduct = () => {
         };
         
         // Get employee data to verify permissions
-        const employeeRes = await api.get('/api/employees/me', config);
+        const employeeRes = await api.get('/employees/me', config);
         console.log('Employee data:', employeeRes.data);
         
         if (!employeeRes.data.permissions?.canAddProducts) {
@@ -51,7 +51,7 @@ const EmployeeAddProduct = () => {
         // setEmployeeData(employeeRes.data); // Commented out to fix no-undef error
         
         // Get shop data
-        const shopRes = await api.get(`/api/shops/${employeeRes.data.shop}`, config);
+        const shopRes = await api.get(`/shops/${employeeRes.data.shop}`, config);
         console.log('Shop data:', shopRes.data);
         setShop(shopRes.data);
         
@@ -104,7 +104,7 @@ const EmployeeAddProduct = () => {
       
       console.log('Submitting product data:', payload);
       
-      const response = await api.post('/api/products', payload, config);
+      const response = await api.post('/products', payload, config);
       console.log('Product created:', response.data);
       
       toast.success('Product added successfully!');
