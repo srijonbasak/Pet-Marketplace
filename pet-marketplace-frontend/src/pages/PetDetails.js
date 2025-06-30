@@ -1,18 +1,14 @@
+
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Carousel, Badge, Tabs, Tab, Alert } from 'react-bootstrap';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faHeart, 
-  faPaw, 
-  faMapMarkerAlt, 
-  faCalendarAlt, 
-  faVenusMars, 
-  faRulerVertical,
-  faUser
-} from '@fortawesome/free-solid-svg-icons';
+import { faHeart, faPaw, faMapMarkerAlt, faCalendarAlt, faVenusMars, faRulerVertical, faUser } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { useAuth } from '../hooks/useAuth';
+import { motion } from 'framer-motion';
+import PetAdoptionLottie from '../components/common/PetAdoptionLottie';
+import './PetDetails.css';
 
 const PetDetails = () => {
   const { id } = useParams();
@@ -85,6 +81,7 @@ const PetDetails = () => {
     }
   };
 
+
   if (loading) {
     return (
       <Container className="py-5 text-center">
@@ -106,29 +103,45 @@ const PetDetails = () => {
   }
 
   return (
-    <Container className="py-4">
-      <Row>
-        <Col lg={7} className="mb-4">
-          <Carousel interval={null} className="shadow-sm rounded overflow-hidden">
-            {pet.images?.map((image, index) => (
-              <Carousel.Item key={index}>
-                <img
-                  className="d-block w-100"
-                  src={image}
-                  alt={`${pet.name} - image ${index + 1}`}
-                  style={{ height: '500px', objectFit: 'cover' }}
-                />
-              </Carousel.Item>
-            ))}
-          </Carousel>
-        </Col>
-        
-        <Col lg={5}>
-          <Card className="shadow-sm mb-4">
-            <Card.Body>
+    <div>
+      {/* Hero Section */}
+      <div className="pet-details-hero d-flex flex-column flex-md-row align-items-center justify-content-center text-center gap-4" style={{ marginBottom: '2.5rem' }}>
+        <div className="pet-details-hero-content w-100" style={{ maxWidth: 600 }}>
+          <motion.h1 className="pet-details-hero-title" initial={{ y: -40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.5, type: 'spring' }}>
+            Meet {pet.name}
+          </motion.h1>
+          <motion.p className="pet-details-hero-subtitle" initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.5, delay: 0.2, type: 'spring' }}>
+            {pet.breed} • {pet.age} {pet.ageUnit} old • {pet.gender === 'male' ? 'Male' : 'Female'}
+          </motion.p>
+        </div>
+        <motion.div className="pet-details-hero-lottie d-flex justify-content-center align-items-center" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, type: 'spring' }}>
+          <PetAdoptionLottie style={{ width: 320, height: 320, minWidth: 220, maxWidth: 400, background: 'none' }} />
+        </motion.div>
+      </div>
+
+      <Container className="py-4">
+        <Row>
+          <Col lg={7} className="mb-4">
+            <motion.div initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, type: 'spring' }}>
+              <Carousel interval={null} className="shadow-sm rounded overflow-hidden">
+                {pet.images?.map((image, index) => (
+                  <Carousel.Item key={index}>
+                    <img
+                      className="d-block w-100 pet-details-img"
+                      src={image}
+                      alt={`${pet.name} - image ${index + 1}`}
+                      style={{ height: '420px', objectFit: 'cover' }}
+                    />
+                  </Carousel.Item>
+                ))}
+              </Carousel>
+            </motion.div>
+          </Col>
+          <Col lg={5}>
+            <motion.div className="pet-details-card mb-4 p-4" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, type: 'spring' }}>
               <div className="d-flex justify-content-between align-items-start mb-3">
                 <div>
-                  <h1 className="mb-1">{pet.name}</h1>
+                  <h2 className="mb-1 fw-bold">{pet.name}</h2>
                   <p className="text-muted mb-2">
                     {pet.breed} • {pet.age} {pet.ageUnit} old
                   </p>
@@ -137,11 +150,11 @@ const PetDetails = () => {
                   variant={isFavorite ? 'danger' : 'outline-danger'} 
                   onClick={toggleFavorite}
                   size="sm"
+                  className="pet-details-btn"
                 >
                   <FontAwesomeIcon icon={faHeart} />
                 </Button>
               </div>
-              
               <div className="mb-3">
                 <Badge bg={pet.status === 'available' ? 'success' : pet.status === 'pending' ? 'warning' : 'danger'} className="me-2">
                   {pet.status === 'available' ? 'Available' : pet.status === 'pending' ? 'Pending' : 'Adopted'}
@@ -156,7 +169,6 @@ const PetDetails = () => {
                   <Badge bg="info">Microchipped</Badge>
                 )}
               </div>
-              
               <Row className="mb-3">
                 <Col xs={6} className="mb-2">
                   <div className="d-flex align-items-center">
@@ -187,9 +199,7 @@ const PetDetails = () => {
                   </div>
                 </Col>
               </Row>
-              
               <hr />
-              
               <div className="mb-3">
                 <h5>Good with</h5>
                 <div>
@@ -200,16 +210,14 @@ const PetDetails = () => {
                   ))}
                 </div>
               </div>
-              
               <hr />
-              
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <div>
                   <h3 className="text-primary mb-0">${pet.adoptionFee}</h3>
                   <small className="text-muted">Adoption Fee</small>
                 </div>
                 <Button 
-                  variant="primary" 
+                  className="pet-details-btn"
                   size="lg"
                   onClick={handleAdoptClick}
                   disabled={pet.status !== 'available'}
@@ -218,17 +226,13 @@ const PetDetails = () => {
                   Adopt Me
                 </Button>
               </div>
-              
               {pet.status !== 'available' && (
                 <Alert variant="warning">
                   This pet is currently not available for adoption.
                 </Alert>
               )}
-            </Card.Body>
-          </Card>
-          
-          <Card className="shadow-sm mb-4">
-            <Card.Body>
+            </motion.div>
+            <motion.div className="pet-details-card mb-4 p-4" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.1, type: 'spring' }}>
               <div className="d-flex align-items-center mb-3">
                 <FontAwesomeIcon icon={faUser} className="text-primary me-2" size="lg" />
                 <div>
@@ -236,7 +240,6 @@ const PetDetails = () => {
                   <small className="text-muted">{provider?.type === 'ngo' ? 'Rescue Organization' : 'Pet Seller'}</small>
                 </div>
               </div>
-              
               <div className="mb-3">
                 <p className="mb-1">
                   <strong>Email:</strong> {provider?.email}
@@ -253,31 +256,25 @@ const PetDetails = () => {
                   </p>
                 )}
               </div>
-              
               <div className="d-grid">
                 <Link to={`/providers/${provider?._id}`} className="btn btn-outline-primary">
                   View Profile
                 </Link>
               </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-      
-      <Row className="mt-4">
-        <Col>
-          <Tabs defaultActiveKey="description" className="mb-4">
-            <Tab eventKey="description" title="Description">
-              <Card className="shadow-sm">
-                <Card.Body>
+            </motion.div>
+          </Col>
+        </Row>
+        <Row className="mt-4">
+          <Col>
+            <Tabs defaultActiveKey="description" className="mb-4">
+              <Tab eventKey="description" title="Description">
+                <motion.div className="pet-details-card mb-3 p-4" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, type: 'spring' }}>
                   <h4 className="mb-3">About {pet.name}</h4>
                   <p className="mb-0">{pet.description}</p>
-                </Card.Body>
-              </Card>
-            </Tab>
-            <Tab eventKey="details" title="Pet Details">
-              <Card className="shadow-sm">
-                <Card.Body>
+                </motion.div>
+              </Tab>
+              <Tab eventKey="details" title="Pet Details">
+                <motion.div className="pet-details-card mb-3 p-4" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1, type: 'spring' }}>
                   <Row>
                     <Col md={6}>
                       <h5 className="mb-3">Physical Characteristics</h5>
@@ -320,12 +317,10 @@ const PetDetails = () => {
                       </ul>
                     </Col>
                   </Row>
-                </Card.Body>
-              </Card>
-            </Tab>
-            <Tab eventKey="adoption" title="Adoption Process">
-              <Card className="shadow-sm">
-                <Card.Body>
+                </motion.div>
+              </Tab>
+              <Tab eventKey="adoption" title="Adoption Process">
+                <motion.div className="pet-details-card mb-3 p-4" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2, type: 'spring' }}>
                   <h4 className="mb-3">Adoption Process</h4>
                   <p>
                     Our adoption process is designed to make sure our pets go to loving, suitable homes.
@@ -340,55 +335,54 @@ const PetDetails = () => {
                   </ol>
                   <div className="d-grid">
                     <Button 
-                      variant="primary"
+                      className="pet-details-btn"
                       onClick={handleAdoptClick}
                       disabled={pet.status !== 'available'}
                     >
                       Start Adoption Process
                     </Button>
                   </div>
-                </Card.Body>
-              </Card>
-            </Tab>
-          </Tabs>
-        </Col>
-      </Row>
-      
-      <Row className="mt-4">
-        <Col>
-          <h3 className="mb-4">Similar Pets</h3>
-          <Row xs={1} md={2} lg={4} className="g-4">
-            {similarPets.map(similarPet => (
-              <Col key={similarPet._id}>
-                <Card className="h-100 shadow-sm pet-card">
-                  <Card.Img 
-                    variant="top" 
-                    src={similarPet.images && similarPet.images.length > 0 ? similarPet.images[0] : 'https://via.placeholder.com/300x200?text=No+Image'} 
-                    alt={similarPet.name}
-                    className="pet-card-img"
-                  />
-                  <Card.Body>
-                    <Card.Title>{similarPet.name}</Card.Title>
-                    <Card.Subtitle className="mb-2 text-muted">
-                      {similarPet.breed} • {similarPet.age} {similarPet.ageUnit} • {similarPet.gender}
-                    </Card.Subtitle>
-                  </Card.Body>
-                  <Card.Footer className="bg-white">
-                    <div className="d-flex justify-content-between align-items-center">
-                      <span className="fw-bold text-primary">${similarPet.adoptionFee}</span>
-                      <Link to={`/pets/${similarPet._id}`} className="btn btn-sm btn-primary">
-                        View Details
-                      </Link>
-                    </div>
-                  </Card.Footer>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </Col>
-      </Row>
-    </Container>
+                </motion.div>
+              </Tab>
+            </Tabs>
+          </Col>
+        </Row>
+        <Row className="mt-4">
+          <Col>
+            <h3 className="mb-4">Similar Pets</h3>
+            <Row xs={1} md={2} lg={4} className="g-4">
+              {similarPets.map(similarPet => (
+                <Col key={similarPet._id}>
+                  <motion.div className="h-100 similar-pet-card" whileHover={{ scale: 1.04, boxShadow: '0 6px 24px 0 rgba(80,180,80,0.18)' }} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, type: 'spring' }}>
+                    <Card.Img 
+                      variant="top" 
+                      src={similarPet.images && similarPet.images.length > 0 ? similarPet.images[0] : 'https://via.placeholder.com/300x200?text=No+Image'} 
+                      alt={similarPet.name}
+                      className="similar-pet-card-img"
+                    />
+                    <Card.Body>
+                      <Card.Title>{similarPet.name}</Card.Title>
+                      <Card.Subtitle className="mb-2 text-muted">
+                        {similarPet.breed} • {similarPet.age} {similarPet.ageUnit} • {similarPet.gender}
+                      </Card.Subtitle>
+                    </Card.Body>
+                    <Card.Footer className="bg-white">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <span className="fw-bold text-primary">${similarPet.adoptionFee}</span>
+                        <Link to={`/pets/${similarPet._id}`} className="btn btn-sm pet-details-btn">
+                          View Details
+                        </Link>
+                      </div>
+                    </Card.Footer>
+                  </motion.div>
+                </Col>
+              ))}
+            </Row>
+          </Col>
+        </Row>
+      </Container>
+    </div>
   );
 };
 
-export default PetDetails; 
+export default PetDetails;

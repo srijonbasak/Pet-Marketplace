@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Spinner, Alert, Button, Badge } from 'react-bootstrap';
+import { motion } from 'framer-motion';
+import './ProductDetails.css';
 import { useParams, Link } from 'react-router-dom';
 import { productAPI } from '../services/api';
 import { useCart } from '../context/CartContext';
@@ -64,53 +66,66 @@ const ProductDetails = () => {
       <Row>
         <Col md={6} className="mb-4">
           {product.images && product.images.length > 0 ? (
-            <Card.Img
+            <motion.img
               src={product.images[0]}
               alt={product.name}
-              style={{ objectFit: 'cover', width: '100%', height: '350px' }}
+              className="product-details-img w-100"
+              style={{ height: '350px', objectFit: 'cover' }}
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, type: 'spring' }}
             />
           ) : (
-            <div className="bg-light d-flex align-items-center justify-content-center" style={{ height: '350px' }}>
+            <motion.div className="bg-light d-flex align-items-center justify-content-center rounded-4" style={{ height: '350px' }}
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, type: 'spring' }}
+            >
               <span>No Image</span>
-            </div>
+            </motion.div>
           )}
         </Col>
         <Col md={6}>
-          <h2>{product.name}</h2>
-          <p><strong>Category:</strong> {product.category}</p>
-          <p><strong>Price:</strong> ${product.price}</p>
-          <p>
-            <strong>Stock:</strong> {product.stock}{' '}
-            {outOfStock && <Badge bg="danger">Out of Stock</Badge>}
-          </p>
-          <p><strong>Description:</strong> {product.description}</p>
-          {product.shop && (
-            <p><strong>Shop:</strong> {product.shop.name}</p>
-          )}
-          {product.seller && (
-            <p><strong>Seller:</strong> {product.seller.firstName} {product.seller.lastName}</p>
-          )}
-          <div className="mb-3">
-            <Button
-              variant="primary"
-              className="me-2"
-              onClick={handleAddToCart}
-              disabled={outOfStock}
-            >
-              Add to Cart
-            </Button>
-            <Button
-              variant="outline-secondary"
-              onClick={handleAddToWishlist}
-            >
-              Add to Wishlist
-            </Button>
-          </div>
-          {cartMsg && <Alert variant="success">{cartMsg}</Alert>}
-          {wishlistMsg && <Alert variant="success">{wishlistMsg}</Alert>}
-          <Link to="/products" className="btn btn-outline-primary mt-3">
-            Back to Products
-          </Link>
+          <motion.div className="product-details-card p-4"
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, type: 'spring' }}
+          >
+            <h2 className="fw-bold mb-2 text-success-emphasis">{product.name}</h2>
+            <p className="mb-2"><strong>Category:</strong> <Badge bg="info" text="dark">{product.category}</Badge></p>
+            <p className="mb-2"><strong>Price:</strong> <span className="fw-bold text-success fs-5">${product.price}</span></p>
+            <p className="mb-2">
+              <strong>Stock:</strong> <Badge bg={outOfStock ? 'danger' : 'success'}>{outOfStock ? 'Out of Stock' : product.stock}</Badge>
+            </p>
+            <p className="mb-2"><strong>Description:</strong> {product.description}</p>
+            {product.shop && (
+              <p className="mb-2"><strong>Shop:</strong> {product.shop.name}</p>
+            )}
+            {product.seller && (
+              <p className="mb-2"><strong>Seller:</strong> {product.seller.firstName} {product.seller.lastName}</p>
+            )}
+            <div className="mb-3 d-flex gap-2">
+              <Button
+                className="product-details-btn"
+                onClick={handleAddToCart}
+                disabled={outOfStock}
+              >
+                Add to Cart
+              </Button>
+              <Button
+                variant="outline-dark"
+                className="rounded-pill px-3 product-details-btn"
+                onClick={handleAddToWishlist}
+              >
+                Add to Wishlist
+              </Button>
+            </div>
+            {cartMsg && <Alert variant="success">{cartMsg}</Alert>}
+            {wishlistMsg && <Alert variant="success">{wishlistMsg}</Alert>}
+            <Link to="/products" className="btn btn-outline-primary mt-3 rounded-pill px-3">
+              Back to Products
+            </Link>
+          </motion.div>
         </Col>
       </Row>
     </Container>

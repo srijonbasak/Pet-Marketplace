@@ -1,0 +1,54 @@
+.rescue-details-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+}
+.rescue-details-hero-content {
+  flex: 1;
+}
+.rescue-details-hero-title {
+  font-size: 2.7rem;
+  font-weight: 800;
+  color: #6a82fb;
+  margin-bottom: 0.5rem;
+  letter-spacing: -1px;
+}
+.rescue-details-hero-subtitle {
+  font-size: 1.3rem;
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+.rescue-details-hero-lottie {
+  width: 320px;
+  min-width: 220px;
+  max-width: 400px;
+  height: 320px;
+  background: none;
+}
+.rescue-details-card {
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px 0 rgba(80, 80, 180, 0.10), 0 1.5px 6px 0 rgba(80, 80, 180, 0.08);
+  background: #fff;
+  transition: box-shadow 0.3s cubic-bezier(.4,2,.6,1), transform 0.3s cubic-bezier(.4,2,.6,1);
+}
+.rescue-details-card:hover {
+  box-shadow: 0 8px 32px 0 rgba(80, 80, 180, 0.18), 0 3px 12px 0 rgba(80, 80, 180, 0.12);
+  transform: translateY(-4px) scale(1.01);
+}
+.rescue-details-btn {
+  background: linear-gradient(90deg, #fc5c7d 0%, #6a82fb 100%);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  border-radius: 2rem;
+  padding: 0.5rem 1.5rem;
+  transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+  box-shadow: 0 2px 8px 0 rgba(80, 80, 180, 0.10);
+}
+.rescue-details-btn:hover {
+  background: linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%);
+  color: #fff;
+  box-shadow: 0 4px 16px 0 rgba(80, 80, 180, 0.18);
+}
