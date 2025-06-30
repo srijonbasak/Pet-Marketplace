@@ -3,10 +3,11 @@ import { Container, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaw, faEnvelope, faPhone, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
+import './Footer.css';
 
 const Footer = () => {
   return (
-    <footer className="bg-dark text-light py-4 mt-5">
+    <footer className="footer-custom mt-5">
       <Container>
         <Row>
           <Col md={4} className="mb-4 mb-md-0">

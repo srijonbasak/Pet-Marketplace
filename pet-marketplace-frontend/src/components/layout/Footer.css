@@ -1,0 +1,18 @@
+.footer-custom {
+  background: #181b1f !important;
+  color: #e0e0e0 !important;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+  min-height: 60px;
+  font-size: 1rem;
+}
+.footer-custom a,
+.footer-custom .text-muted {
+  color: #b0b8c1 !important;
+}
+.footer-custom h5 {
+  color: #fff !important;
+}
+.footer-custom hr {
+  border-color: #333;
+}

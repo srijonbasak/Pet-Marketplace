@@ -1,23 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useSpring, useTransform, useVelocity, useMotionValue, useAnimationFrame } from 'framer-motion';
-import LaserPointerCursor from './LaserPointerCursor';
+// import LaserPointerCursor from './LaserPointerCursor';
 import './InteractivePetBackground.css';
+// LaserPointerCursor logic and import removed
 
-// Using local assets for reliability
-const pets = [
-  { 
-    id: 'cat', 
-    url: '/cat.png', // A cute, peeking cat from the public folder
-    stiffness: 220, damping: 30, mass: 1,
-    xOffset: -50, yOffset: 20
-  },
-  { 
-    id: 'dog', 
-    url: '/dog.png', // A happy Corgi from the public folder
-    stiffness: 120, damping: 25, mass: 1.5,
-    xOffset: 50, yOffset: 100
-  },
-];
+// No pets to display; previously used for laser pointer effect
+const pets = [];
 
 const Pet = ({ pet, target }) => {
   const x = useSpring(0, { stiffness: pet.stiffness, damping: pet.damping, mass: pet.mass });
@@ -55,24 +43,13 @@ const Pet = ({ pet, target }) => {
 };
 
 const InteractivePetBackground = () => {
-  const [isHovered, setIsHovered] = useState(false);
-  const laserPosition = useMotionValue({ x: -100, y: -100 });
-
-  const handlePositionChange = (pos) => {
-    laserPosition.set(pos);
-  };
+  // Laser pointer logic removed
+  const laserPosition = { get: () => ({ x: 0, y: 0 }) };
 
   return (
-    <div 
-      className="interactive-pet-background" 
-      onMouseEnter={() => setIsHovered(true)} 
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {isHovered && <LaserPointerCursor onPositionChange={handlePositionChange} />}
+    <div className="interactive-pet-background">
       <div className="pet-container">
-        {pets.map((pet, i) => (
-          <Pet key={i} pet={pet} target={laserPosition} />
-        ))}
+        {/* No pets to display */}
       </div>
     </div>
   );
