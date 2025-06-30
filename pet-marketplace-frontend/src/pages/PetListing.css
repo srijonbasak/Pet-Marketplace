@@ -1,0 +1,24 @@
+.pet-card-custom {
+  transition: box-shadow 0.3s cubic-bezier(.4,2,.6,1), transform 0.3s cubic-bezier(.4,2,.6,1);
+  box-shadow: 0 4px 24px 0 rgba(80, 120, 220, 0.10), 0 1.5px 6px 0 rgba(80, 120, 220, 0.08);
+  background: #fff;
+}
+.pet-card-custom:hover {
+  box-shadow: 0 8px 32px 0 rgba(80, 120, 220, 0.18), 0 3px 12px 0 rgba(80, 120, 220, 0.12);
+  transform: translateY(-6px) scale(1.025);
+}
+.pet-card-img {
+  transition: transform 0.5s cubic-bezier(.4,2,.6,1);
+}
+.pet-card-custom:hover .pet-card-img {
+  transform: scale(1.08) rotate(-2deg);
+}
+.pet-card-btn {
+  transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+  box-shadow: 0 2px 8px 0 rgba(80, 120, 220, 0.10);
+}
+.pet-card-btn:hover {
+  background: linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%);
+  color: #fff;
+  box-shadow: 0 4px 16px 0 rgba(80, 120, 220, 0.18);
+}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import PetAdoptionLottie from '../components/common/PetAdoptionLottie';
 import { Container, Row, Col, Card, Form, Button, Pagination } from 'react-bootstrap';
+import './PetListing.css';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter, faSearch, faSortAmountDown } from '@fortawesome/free-solid-svg-icons';
@@ -308,37 +309,46 @@ const PetListing = () => {
               <Row xs={1} md={2} lg={3} className="g-4">
                 {pets.map(pet => (
                   <Col key={pet._id}>
-                    <Card className="h-100 shadow-sm pet-card">
-                      <Card.Img 
-                        variant="top" 
-                        src={pet.images && pet.images.length > 0 ? pet.images[0] : 'https://via.placeholder.com/300x200?text=No+Image'} 
-                        alt={pet.name}
-                        className="pet-card-img"
-                      />
-                      <Card.Body>
-                        <Card.Title>{pet.name}</Card.Title>
-                        <Card.Subtitle className="mb-2 text-muted">
-                          {pet.breed} • {pet.age} {pet.ageUnit} • {pet.gender}
-                        </Card.Subtitle>
-                        <Card.Text>{pet.description.substring(0, 80)}...</Card.Text>
-                        <div className="d-flex mb-2">
-                          {pet.vaccinated && (
-                            <span className="badge bg-success me-2">Vaccinated</span>
-                          )}
-                          {pet.neutered && (
-                            <span className="badge bg-info">Neutered/Spayed</span>
-                          )}
-                        </div>
-                      </Card.Body>
-                      <Card.Footer className="bg-white">
-                        <div className="d-flex justify-content-between align-items-center">
-                          <span className="fw-bold text-primary">${pet.adoptionFee}</span>
-                          <Link to={`/pets/${pet._id}`} className="btn btn-sm btn-primary">
-                            View Details
-                          </Link>
-                        </div>
-                      </Card.Footer>
-                    </Card>
+                    <div className="h-100">
+                      <div className="pet-card-anim h-100">
+                        <Card className="h-100 border-0 shadow-lg rounded-4 overflow-hidden position-relative pet-card-custom">
+                          <div className="overflow-hidden position-relative" style={{ height: 220 }}>
+                            <Card.Img 
+                              variant="top" 
+                              src={pet.images && pet.images.length > 0 ? pet.images[0] : 'https://via.placeholder.com/300x200?text=No+Image'} 
+                              alt={pet.name}
+                              style={{ objectFit: 'cover', height: '100%', width: '100%', transition: 'transform 0.5s cubic-bezier(.4,2,.6,1)', borderRadius: '0 0 1.5rem 1.5rem' }}
+                              className="pet-card-img"
+                            />
+                          </div>
+                          <Card.Body className="d-flex flex-column justify-content-between p-4">
+                            <div>
+                              <Card.Title className="fw-bold fs-4 mb-2 text-primary-emphasis">{pet.name}</Card.Title>
+                              <Card.Subtitle className="mb-2 text-muted">
+                                {pet.breed} • {pet.age} {pet.ageUnit} • {pet.gender}
+                              </Card.Subtitle>
+                              <Card.Text className="mb-3 text-secondary">
+                                {pet.description.substring(0, 80)}...
+                              </Card.Text>
+                            </div>
+                            <div className="mb-2 small">
+                              {pet.vaccinated && (
+                                <span className="badge bg-success me-2">Vaccinated</span>
+                              )}
+                              {pet.neutered && (
+                                <span className="badge bg-info">Neutered/Spayed</span>
+                              )}
+                            </div>
+                            <div className="d-flex justify-content-between align-items-center mt-2">
+                              <span className="fw-bold text-primary fs-5">${pet.adoptionFee}</span>
+                              <Link to={`/pets/${pet._id}`} className="btn pet-card-btn rounded-pill px-3" style={{ background: 'linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%)', color: '#fff', border: 'none', fontWeight: 600 }}>
+                                View Details
+                              </Link>
+                            </div>
+                          </Card.Body>
+                        </Card>
+                      </div>
+                    </div>
                   </Col>
                 ))}
               </Row>
