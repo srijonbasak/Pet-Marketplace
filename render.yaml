@@ -4,7 +4,7 @@ services:
     env: node
     plan: free
     buildCommand: npm install
-    startCommand: npm run dev
+    startCommand: node server.js
     envVars:
       - key: NODE_VERSION
         value: 18.20.2
