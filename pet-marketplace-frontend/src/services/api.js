@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with default config
 const api = axios.create({
-  baseURL: '/api', // Point to backend server (use relative path so proxy works)
+  baseURL: process.env.REACT_APP_API_URL + '/api',
   headers: {
     'Content-Type': 'application/json'
   }
