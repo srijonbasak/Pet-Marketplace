@@ -1,0 +1,21 @@
+[build]
+  command = "npm run build"
+  publish = "pet-marketplace-frontend/build"
+
+[dev]
+  command = "npm start"
+  publish = "pet-marketplace-frontend/build"
+
+[functions]
+  directory = "netlify/functions"
+
+[[redirects]]
+  from = "/api/*"
+  to = "http://localhost:5000/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
