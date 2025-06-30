@@ -14,7 +14,7 @@ const EmployeeAddProduct = () => {
     stock: '',
     image: ''
   });
-  const [employeeData, setEmployeeData] = useState(null);
+  // const [employeeData, setEmployeeData] = useState(null); // Commented out, but setEmployeeData is used below
   const [shop, setShop] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -48,7 +48,7 @@ const EmployeeAddProduct = () => {
           return;
         }
         
-        setEmployeeData(employeeRes.data);
+        // setEmployeeData(employeeRes.data); // Commented out to fix no-undef error
         
         // Get shop data
         const shopRes = await axios.get(`/api/shops/${employeeRes.data.shop}`, config);

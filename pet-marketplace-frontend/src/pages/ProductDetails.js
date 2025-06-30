@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Spinner, Alert, Button, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Spinner, Alert, Button, Badge } from 'react-bootstrap'; // All imported components are used
 import { motion } from 'framer-motion';
 import './ProductDetails.css';
 import { useParams, Link } from 'react-router-dom';

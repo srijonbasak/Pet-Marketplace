@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Card, Button, Alert } from 'react-bootstrap';
+import { Container, Button, Alert } from 'react-bootstrap'; // Card removed, not used
 import { useParams, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';

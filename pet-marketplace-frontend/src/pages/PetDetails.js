@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Button, Carousel, Badge, Tabs, Tab, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Carousel, Badge, Tabs, Tab, Alert } from 'react-bootstrap'; // All imported components are used
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faPaw, faMapMarkerAlt, faCalendarAlt, faVenusMars, faRulerVertical, faUser } from '@fortawesome/free-solid-svg-icons';
@@ -13,7 +13,7 @@ import './PetDetails.css';
 const PetDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isAuthenticated, currentUser } = useAuth();
+  const { isAuthenticated } = useAuth();
   
   const [pet, setPet] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -126,12 +126,12 @@ const PetDetails = () => {
               <Carousel interval={null} className="shadow-sm rounded overflow-hidden">
                 {pet.images?.map((image, index) => (
                   <Carousel.Item key={index}>
-                    <img
-                      className="d-block w-100 pet-details-img"
-                      src={image}
-                      alt={`${pet.name} - image ${index + 1}`}
-                      style={{ height: '420px', objectFit: 'cover' }}
-                    />
+                <img
+                  className="d-block w-100 pet-details-img"
+                  src={image}
+                  alt={`${pet.name}`}
+                  style={{ height: '420px', objectFit: 'cover' }}
+                />
                   </Carousel.Item>
                 ))}
               </Carousel>

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import PetAdoptionLottie from '../components/common/PetAdoptionLottie';
-import { Container, Row, Col, Card, Form, Button, Pagination } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Button, Pagination } from 'react-bootstrap'; // All imported components are used
 import './PetListing.css';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilter, faSearch, faSortAmountDown } from '@fortawesome/free-solid-svg-icons';
+import { faFilter, faSearch } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 
 const PetListing = () => {

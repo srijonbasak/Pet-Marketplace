@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 const UpdateInventory = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  // const { user } = useAuth();
   
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);

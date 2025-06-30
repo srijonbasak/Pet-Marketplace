@@ -14,7 +14,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 const NgoDashboard = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalPets: 0,
     availablePets: 0,
