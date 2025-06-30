@@ -31,6 +31,7 @@ const EmployeeManagement = () => {
     if (shopId) {
       fetchEmployees();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shopId]);
 
   const fetchShopId = async () => {

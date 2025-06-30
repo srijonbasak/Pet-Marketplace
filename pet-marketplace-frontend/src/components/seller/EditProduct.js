@@ -19,8 +19,7 @@ const EditProduct = () => {
   });
   
   // ESLint: These are used only for side effects, so keep them defined but comment out their usage below.
-  const [shopId, setShopId] = useState('');
-  const [originalProduct, setOriginalProduct] = useState(null);
+  // Removed unused shopId and originalProduct to fix ESLint warnings
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(true);

@@ -143,6 +143,7 @@ const CreateInvoice = () => {
     console.log(`Input change: ${name} = ${value}`);
     
     if (name.startsWith('items.')) {
+  // eslint-disable-next-line no-unused-vars
   const [, field] = name.split('.');
       const newItems = [...formData.items];
       
