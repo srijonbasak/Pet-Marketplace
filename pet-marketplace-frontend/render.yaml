@@ -1,0 +1,6 @@
+services:
+  - type: static
+    name: pet-marketplace-frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
+    rootDir: .

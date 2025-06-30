@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: pet-adoption-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_VERSION
+        value: 18.20.2
+    autoDeploy: true
+    rootDir: .
