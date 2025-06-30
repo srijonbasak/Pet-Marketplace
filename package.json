@@ -1,0 +1,7 @@
+{
+  "name": "pet-marketplace-root",
+  "private": true,
+  "scripts": {
+    "build": "cd pet-marketplace-frontend && npm install && npm run build"
+  }
+}
