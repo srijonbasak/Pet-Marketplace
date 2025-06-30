@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Card, Button, Table, Alert, Spinner } from 'react-bootstrap';
+import { Container, Button, Table, Alert, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 
 const PendingAdoptions = () => {

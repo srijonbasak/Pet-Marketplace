@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Table, Badge } from 'react-bootstrap';
-import { Link } from 'react-router-dom'; // useNavigate unused
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -14,7 +14,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 const NgoDashboard = () => {
-  // const navigate = useNavigate();
+  // const navigate = useNavigate(); // Unused
   const [stats, setStats] = useState({
     totalPets: 0,
     availablePets: 0,

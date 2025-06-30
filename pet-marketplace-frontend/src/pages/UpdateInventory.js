@@ -240,7 +240,7 @@ const UpdateInventory = () => {
                       {product.images && product.images.length > 0 ? (
                         <img 
                           src={product.images[0]} 
-                          alt={product.name} 
+                          alt={product.name.replace(/(image|photo|picture)/gi, '').trim()} 
                           className="img-fluid rounded"
                           onError={(e) => {
                             e.target.onerror = null;
@@ -250,7 +250,7 @@ const UpdateInventory = () => {
                       ) : (
                         <img 
                           src="https://via.placeholder.com/300x200?text=No+Image" 
-                          alt="No product image" 
+                          alt="No product" 
                           className="img-fluid rounded" 
                         />
                       )}
