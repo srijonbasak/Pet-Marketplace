@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import PetAdoptionLottie from '../components/common/PetAdoptionLottie';
 import { Container, Row, Col, Card, Form, Button, Pagination } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -93,27 +95,51 @@ const PetListing = () => {
   };
 
   return (
-    <Container className="py-4">
-      <Row>
-        <Col md={12} className="mb-4">
-          <div className="d-flex justify-content-between align-items-center">
-            <h1>Pets for Adoption</h1>
-            <Button 
-              variant="outline-primary" 
-              className="d-md-none"
-              onClick={handleFilterToggle}
-            >
-              <FontAwesomeIcon icon={faFilter} className="me-2" />
-              {showFilters ? 'Hide Filters' : 'Show Filters'}
-            </Button>
+    <>
+      <div className="hero-section text-white py-5 position-relative" style={{ overflow: 'hidden', minHeight: 320, background: 'linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%)' }}>
+        <Container className="position-relative" style={{ zIndex: 2 }}>
+          <div className="row align-items-center flex-column-reverse flex-md-row">
+            <div className="col-12 col-md-7 text-center text-md-start mb-4 mb-md-0">
+              <motion.h1 className="display-4 fw-bold mb-3" initial={{ y: -40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.5, type: 'spring' }}>
+                Pets for Adoption
+              </motion.h1>
+              <motion.p className="lead mb-4" initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.5, delay: 0.2, type: 'spring' }}>
+                Find your perfect companion from our selection of loving pets.
+              </motion.p>
+              <motion.div className="d-grid gap-3 d-md-flex justify-content-md-start justify-content-center" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.5, delay: 0.4, type: 'spring' }}>
+                <Button variant="primary" size="lg" className="rounded-pill px-4 py-2 shadow-sm">
+                  <span className="fw-bold">Adopt Now</span>
+                </Button>
+              </motion.div>
+            </div>
+            <div className="col-12 col-md-5 d-flex justify-content-center align-items-center position-relative" style={{ minHeight: 220 }}>
+              <div style={{ position: 'relative', width: 'min(90vw, 260px)', height: 'min(90vw, 260px)', zIndex: 2 }}>
+                <PetAdoptionLottie style={{ width: '100%', height: '100%' }} />
+              </div>
+            </div>
           </div>
-        </Col>
-      </Row>
-
-      <Row>
-        {/* Filters */}
-        <Col md={3} className={`mb-4 ${showFilters ? 'd-block' : 'd-none d-md-block'}`}>
-          <Card>
+        </Container>
+      </div>
+      <Container className="py-4">
+        <Row>
+          <Col md={12} className="mb-4">
+            <div className="d-flex justify-content-between align-items-center">
+              <h2 className="fw-bold">Browse All Pets</h2>
+              <Button 
+                variant="outline-primary" 
+                className="d-md-none rounded-pill"
+                onClick={handleFilterToggle}
+              >
+                <FontAwesomeIcon icon={faFilter} className="me-2" />
+                {showFilters ? 'Hide Filters' : 'Show Filters'}
+              </Button>
+            </div>
+          </Col>
+        </Row>
+        <Row>
+          {/* Filters */}
+          <Col md={3} className={`mb-4 ${showFilters ? 'd-block' : 'd-none d-md-block'}`}>
+            <Card>
             <Card.Header className="bg-primary text-white">
               <FontAwesomeIcon icon={faFilter} className="me-2" />
               Filters
@@ -346,6 +372,7 @@ const PetListing = () => {
         </Col>
       </Row>
     </Container>
+    </>
   );
 };
 

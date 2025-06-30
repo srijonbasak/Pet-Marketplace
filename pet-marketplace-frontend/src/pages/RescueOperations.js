@@ -4,7 +4,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHandHoldingHeart, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+
 import { useAuth } from '../hooks/useAuth';
+import RescueLottie from '../components/common/RescueLottie';
 
 const RescueOperations = () => {
   const [rescues, setRescues] = useState([]);
@@ -31,32 +33,46 @@ const RescueOperations = () => {
   const rescuedFeed = rescues;
 
   return (
-    <Container className="py-5">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <FontAwesomeIcon icon={faHandHoldingHeart} size="2x" className="text-primary me-2" />
-          <span className="fs-2 fw-bold">Rescued Animals Feed</span>
-        </div>
-        {isAuthenticated && (
-          <Button as={Link} to="/rescues/new" variant="primary">
-            <FontAwesomeIcon icon={faPlus} className="me-2" />
-            Add Rescue
-          </Button>
-        )}
+    <>
+      <div className="hero-section text-white py-5 position-relative" style={{ overflow: 'hidden', minHeight: 320, background: 'linear-gradient(90deg, #fc5c7d 0%, #6a82fb 100%)' }}>
+        <Container className="position-relative" style={{ zIndex: 2 }}>
+          <div className="row align-items-center flex-column-reverse flex-md-row">
+            <div className="col-12 col-md-7 text-center text-md-start mb-4 mb-md-0">
+              <h1 className="display-4 fw-bold mb-3">Rescue Operations</h1>
+              <p className="lead mb-4">See the latest animal rescues and help make a difference!</p>
+            </div>
+            <div className="col-12 col-md-5 d-flex justify-content-center align-items-center position-relative" style={{ minHeight: 220 }}>
+              <RescueLottie style={{ width: 'min(90vw, 260px)', height: 'min(90vw, 260px)' }} />
+            </div>
+          </div>
+        </Container>
       </div>
-      {error && <Alert variant="danger">{error}</Alert>}
-      {loading ? (
-        <div className="text-center py-5">
-          <Spinner animation="border" variant="primary" />
+      <Container className="py-5">
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <FontAwesomeIcon icon={faHandHoldingHeart} size="2x" className="text-primary me-2" />
+            <span className="fs-2 fw-bold">Rescued Animals Feed</span>
+          </div>
+          {isAuthenticated && (
+            <Button as={Link} to="/rescues/new" variant="primary">
+              <FontAwesomeIcon icon={faPlus} className="me-2" />
+              Add Rescue
+            </Button>
+          )}
         </div>
-      ) : rescuedFeed.length === 0 ? (
-        <Alert variant="info">No rescued animals to show yet.</Alert>
-      ) : (
-        <Row xs={1} md={2} lg={3} className="g-4">
-          {rescuedFeed.map(rescue => (
-            <Col key={rescue._id}>
-              <Card className="h-100 shadow-sm">
-                {rescue.imageUrl && (
+        {error && <Alert variant="danger">{error}</Alert>}
+        {loading ? (
+          <div className="text-center py-5">
+            <Spinner animation="border" variant="primary" />
+          </div>
+        ) : rescuedFeed.length === 0 ? (
+          <Alert variant="info">No rescued animals to show yet.</Alert>
+        ) : (
+          <Row xs={1} md={2} lg={3} className="g-4">
+            {rescuedFeed.map(rescue => (
+              <Col key={rescue._id}>
+                <Card className="h-100 shadow-sm">
+                  {rescue.imageUrl && (
                   <Card.Img 
                     variant="top" 
                     src={rescue.imageUrl} 
@@ -90,7 +106,8 @@ const RescueOperations = () => {
         </Row>
       )}
     </Container>
+    </>
   );
 };
 
-export default RescueOperations; 
+export default RescueOperations;

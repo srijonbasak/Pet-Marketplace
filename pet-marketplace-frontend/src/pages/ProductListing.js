@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Spinner, Alert, Pagination, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+
 import { productAPI } from '../services/api';
 import { useCart } from '../context/CartContext';
+import PetProductLottie from '../components/common/PetProductLottie';
 
 const PRODUCTS_PER_PAGE = 6;
 
@@ -41,23 +43,36 @@ const ProductListing = () => {
   };
 
   return (
-    <Container className="py-5">
-      <h1 className="mb-4">Pet Products</h1>
-      {loading ? (
-        <div className="text-center py-5">
-          <Spinner animation="border" />
-        </div>
-      ) : error ? (
-        <Alert variant="danger">{error}</Alert>
-      ) : products.length === 0 ? (
-        <Alert variant="info">No products found.</Alert>
-      ) : (
-        <>
-          <Row>
-            {paginatedProducts.map(product => (
-              <Col key={product._id} md={4} sm={6} className="mb-4">
-                <Card className="h-100 product-card">
-                  {product.images && product.images[0] && (
+    <>
+      <div className="hero-section text-white py-5 position-relative" style={{ overflow: 'hidden', minHeight: 320, background: 'linear-gradient(90deg, #11998e 0%, #38ef7d 100%)' }}>
+        <Container className="position-relative" style={{ zIndex: 2 }}>
+          <div className="row align-items-center flex-column-reverse flex-md-row">
+            <div className="col-12 col-md-7 text-center text-md-start mb-4 mb-md-0">
+              <h1 className="display-4 fw-bold mb-3">Pet Products</h1>
+              <p className="lead mb-4">Shop for the best products for your pets, from food to toys and more!</p>
+            </div>
+            <div className="col-12 col-md-5 d-flex justify-content-center align-items-center position-relative" style={{ minHeight: 220 }}>
+              <PetProductLottie style={{ width: 'min(90vw, 260px)', height: 'min(90vw, 260px)' }} />
+            </div>
+          </div>
+        </Container>
+      </div>
+      <Container className="py-5">
+        {loading ? (
+          <div className="text-center py-5">
+            <Spinner animation="border" />
+          </div>
+        ) : error ? (
+          <Alert variant="danger">{error}</Alert>
+        ) : products.length === 0 ? (
+          <Alert variant="info">No products found.</Alert>
+        ) : (
+          <>
+            <Row>
+              {paginatedProducts.map(product => (
+                <Col key={product._id} md={4} sm={6} className="mb-4">
+                  <Card className="h-100 product-card">
+                    {product.images && product.images[0] && (
                     <Card.Img
                       variant="top"
                       src={product.images[0]}
@@ -110,7 +125,8 @@ const ProductListing = () => {
         </>
       )}
     </Container>
+    </>
   );
 };
 
-export default ProductListing; 
+export default ProductListing;

@@ -11,7 +11,9 @@ import {
   faHeart,
   faUsers
 } from '@fortawesome/free-solid-svg-icons';
+
 import { useAuth } from '../hooks/useAuth';
+import HeroLottie from '../components/common/HeroLottie';
 import axios from 'axios';
 
 const Dashboard = () => {
@@ -96,28 +98,48 @@ const Dashboard = () => {
   }
 
   return (
-    <Container className="py-4">
-      <Row className="mb-4">
-        <Col>
-          <h1>Dashboard</h1>
-          <p className="text-muted">
-            Welcome back, {user?.username}! 
-            {user?.role === 'buyer' && ' Here you can track your adoption applications.'}
-            {user?.role === 'seller' && ' Here you can manage your pets and products.'}
-            {user?.role === 'ngo' && ' Here you can manage your pets and rescue operations.'}
-            {user?.role === 'admin' && ' Here you can manage the platform.'}
-          </p>
-        </Col>
-      </Row>
+    <>
+      <div className="hero-section text-white py-5 position-relative" style={{ overflow: 'hidden', minHeight: 320, background: 'linear-gradient(90deg, #f7971e 0%, #ffd200 100%)' }}>
+        <Container className="position-relative" style={{ zIndex: 2 }}>
+          <div className="row align-items-center flex-column-reverse flex-md-row">
+            <div className="col-12 col-md-7 text-center text-md-start mb-4 mb-md-0">
+              <h1 className="display-4 fw-bold mb-3">Dashboard</h1>
+              <p className="lead mb-4">
+                Welcome back, {user?.username}!{' '}
+                {user?.role === 'buyer' && 'Here you can track your adoption applications.'}
+                {user?.role === 'seller' && 'Here you can manage your pets and products.'}
+                {user?.role === 'ngo' && 'Here you can manage your pets and rescue operations.'}
+                {user?.role === 'admin' && 'Here you can manage the platform.'}
+              </p>
+            </div>
+            <div className="col-12 col-md-5 d-flex justify-content-center align-items-center position-relative" style={{ minHeight: 220 }}>
+              <HeroLottie style={{ width: 'min(90vw, 260px)', height: 'min(90vw, 260px)' }} />
+            </div>
+          </div>
+        </Container>
+      </div>
+      <Container className="py-4">
+        <Row className="mb-4">
+          <Col>
+            <h1>Dashboard</h1>
+            <p className="text-muted">
+              Welcome back, {user?.username}! 
+              {user?.role === 'buyer' && ' Here you can track your adoption applications.'}
+              {user?.role === 'seller' && ' Here you can manage your pets and products.'}
+              {user?.role === 'ngo' && ' Here you can manage your pets and rescue operations.'}
+              {user?.role === 'admin' && ' Here you can manage the platform.'}
+            </p>
+          </Col>
+        </Row>
 
-      {/* My Adoptions Section */}
-      <Row className="mb-4">
-        <Col>
-          <Card className="shadow-sm">
-            <Card.Header className="bg-white">
-              <div className="d-flex justify-content-between align-items-center">
-                <h5 className="mb-0">
-                  <FontAwesomeIcon icon={faPaw} className="me-2 text-primary" />
+        {/* My Adoptions Section */}
+        <Row className="mb-4">
+          <Col>
+            <Card className="shadow-sm">
+              <Card.Header className="bg-white">
+                <div className="d-flex justify-content-between align-items-center">
+                  <h5 className="mb-0">
+                    <FontAwesomeIcon icon={faPaw} className="me-2 text-primary" />
                   My Adoptions
                 </h5>
                 <Link to="/my-adoptions" className="btn btn-sm btn-outline-primary">
@@ -452,7 +474,8 @@ const Dashboard = () => {
         </Col>
       </Row>
     </Container>
+    </>
   );
 };
 
-export default Dashboard; 
+export default Dashboard;
