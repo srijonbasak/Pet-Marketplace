@@ -10,10 +10,8 @@ services:
         value: 18.20.2
     autoDeploy: true
     rootDir: pet-adoption-backend
-  - type: web
+  - type: static
     name: pet-marketplace-frontend
-    env: static
-    plan: free
     buildCommand: npm install && npm run build
     staticPublishPath: build
     rootDir: pet-marketplace-frontend
